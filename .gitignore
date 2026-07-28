@@ -1,0 +1,22 @@
+# Qt Creator user settings
+CMakeLists.txt.user*
+*.pro.user*
+.qtcreator/
+
+# Build output
+build/
+build-*/
+
+# CMake artifacts (in case of accidental in-source configure)
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+
+# IDE caches
+.qtc_clangd/
+.vscode/
+compile_commands.json
+
+# OS junk
+.DS_Store
+Thumbs.db

@@ -1,0 +1,46 @@
+{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "felgo",
+            "displayName": "Felgo MinGW 64-bit (Debug)",
+            "description": "Uses the Felgo SDK from the default install location C:/Felgo",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/felgo-mingw",
+            "toolchainFile": "C:/Felgo/Felgo/mingw_64/lib/cmake/Qt6/qt.toolchain.cmake",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_C_COMPILER": "C:/Felgo/Tools/mingw1310_64/bin/gcc.exe",
+                "CMAKE_CXX_COMPILER": "C:/Felgo/Tools/mingw1310_64/bin/g++.exe",
+                "CMAKE_MAKE_PROGRAM": "C:/Felgo/Tools/Ninja/ninja.exe"
+            },
+            "environment": {
+                "PATH": "C:\\Felgo\\Tools\\mingw1310_64\\bin;$penv{PATH}"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "felgo-release",
+            "displayName": "Felgo MinGW 64-bit (Release)",
+            "inherits": "felgo",
+            "binaryDir": "${sourceDir}/build/felgo-mingw-release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "felgo",
+            "configurePreset": "felgo"
+        },
+        {
+            "name": "felgo-release",
+            "configurePreset": "felgo-release"
+        }
+    ]
+}
