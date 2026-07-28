@@ -1,22 +1,22 @@
 pragma ComponentBehavior: Bound
-import Felgo
 import QtQuick
 
 FocusScope {
     id: menu
 
-    signal entrySelected(string action)
-
     readonly property var entries: [
         { label: qsTr("New Game"), action: "newGame" },
         { label: qsTr("Quit"), action: "quit" }
     ]
+    required property real touchTargetSize
+
+    signal entrySelected(string action)
 
     width: 180
     height: menuList.height
 
-    function trigger(index) {
-        if (index < 0)
+    function trigger(index: int): void {
+        if (index < 0 || index >= menu.entries.length)
             return
         menu.entrySelected(menu.entries[index].action)
     }
@@ -51,7 +51,13 @@ FocusScope {
             required property var modelData
 
             width: menuList.width
-            height: 32
+            height: menu.touchTargetSize
+
+            Accessible.role: Accessible.MenuItem
+            Accessible.name: delegateItem.modelData.label
+            Accessible.focusable: true
+            Accessible.selected: delegateItem.ListView.isCurrentItem
+            Accessible.onPressAction: menu.trigger(delegateItem.index)
 
             Text {
                 anchors.centerIn: parent

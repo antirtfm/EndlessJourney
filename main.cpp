@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <QCoreApplication>
 #include <FelgoApplication>
 #ifdef USE_FELGO_HOT_RELOAD
 #include <FelgoHotReload>
@@ -26,9 +27,13 @@ int main(int argc, char *argv[])
     // Hot Reload loads Main.qml received from the local Felgo server.
     FelgoHotReload felgoHotReload(&engine);
 #else
-    // Normal builds load the QML source deployed beside the executable.
+    // Normal builds load the QML module embedded by qt_add_qml_module().
     felgo.setMainQmlFileName(QStringLiteral("qml/Main.qml"));
-    engine.load(QUrl(felgo.mainQmlFileName()));
+    QObject::connect(
+        &engine, &QQmlApplicationEngine::objectCreationFailed,
+        &app, []() { QCoreApplication::exit(-1); },
+        Qt::QueuedConnection);
+    engine.load(QUrl(QStringLiteral("qrc:/qml/Main.qml")));
 #endif
 
     return app.exec();
