@@ -30,8 +30,14 @@ set(QmlFiles
     qml/GameScene.qml
     qml/Main.qml
     qml/MainMenu.qml
+    qml/game/HeroSprite.qml
     qml/hud/GameHud.qml
     qml/hud/HudBar.qml
+)
+
+file(GLOB_RECURSE HeroAssetFiles CONFIGURE_DEPENDS
+    RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
+    "assets/hero/*"
 )
 
 # Executable should have same name as project
@@ -44,12 +50,13 @@ felgohotreload_configure_executable(appEndlessJourney)
 
 # Deploy resources to build folder/package directly
 # comment for publishing
-deploy_resources("${QmlFiles}")
+deploy_resources("${QmlFiles};${HeroAssetFiles}")
 
 # Add QML files and resources to QML module to include them via QRC automatically:
 qt_add_qml_module(appEndlessJourney
     URI EndlessJourney
     QML_FILES ${QmlFiles}
+    RESOURCES ${HeroAssetFiles}
     NO_RESOURCE_TARGET_PATH
 )
 
