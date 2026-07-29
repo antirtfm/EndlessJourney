@@ -33,6 +33,7 @@ set(QmlFiles
     qml/game/HeroSprite.qml
     qml/hud/GameHud.qml
     qml/hud/HudBar.qml
+    qml/input/InputController.qml
 )
 
 file(GLOB_RECURSE HeroAssetFiles CONFIGURE_DEPENDS
