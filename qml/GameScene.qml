@@ -25,14 +25,26 @@ Scene {
         color: "#0a0e1a"
     }
 
-    HeroSprite {
-        id: hero
+    Item {
+        id: world
 
-        x: internal.heroX - width / 2
-        y: internal.heroY - height / 2
-        animationName: internal.moving ? "walk" : "idle"
-        facingDirection: internal.sheetDirection
-        running: gameScene.visible
+        x: gameScene.width / 2 - internal.heroX
+        y: gameScene.height / 2 - internal.heroY
+
+        GroundLayer {
+            heroX: internal.heroX
+            heroY: internal.heroY
+            viewWidth: gameScene.gameWindowAnchorItem.width
+            viewHeight: gameScene.gameWindowAnchorItem.height
+        }
+
+        HeroSprite {
+            x: internal.heroX - width / 2
+            y: internal.heroY - height / 2
+            animationName: internal.moving ? "walk" : "idle"
+            facingDirection: internal.sheetDirection
+            running: gameScene.visible
+        }
     }
 
     Text {
@@ -71,8 +83,8 @@ Scene {
         readonly property real movementSpeed: 120
         readonly property list<int> directionMap: [6, 7, 8, 1, 2, 3, 4, 5]
 
-        property real heroX: gameScene.width / 2
-        property real heroY: gameScene.height / 2
+        property real heroX: 0
+        property real heroY: 0
         property real moveX: 0
         property real moveY: 0
         property int facingOctant: 2
@@ -81,8 +93,8 @@ Scene {
         readonly property int sheetDirection: internal.directionMap[internal.facingOctant]
 
         function resetHero(): void {
-            internal.heroX = gameScene.width / 2
-            internal.heroY = gameScene.height / 2
+            internal.heroX = 0
+            internal.heroY = 0
             internal.moveX = 0
             internal.moveY = 0
             internal.facingOctant = 2
@@ -100,16 +112,9 @@ Scene {
             if (!internal.moving)
                 return
 
-            const halfWidth = hero.width / 2
-            const halfHeight = hero.height / 2
             const distance = internal.movementSpeed * frameTime
-            const nextX = internal.heroX + internal.moveX * distance
-            const nextY = internal.heroY + internal.moveY * distance
-
-            internal.heroX = Math.max(halfWidth,
-                                      Math.min(gameScene.width - halfWidth, nextX))
-            internal.heroY = Math.max(halfHeight,
-                                      Math.min(gameScene.height - halfHeight, nextY))
+            internal.heroX += internal.moveX * distance
+            internal.heroY += internal.moveY * distance
         }
 
         function octantFromDirection(x: real, y: real): int {

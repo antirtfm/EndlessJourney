@@ -30,6 +30,7 @@ set(QmlFiles
     qml/GameScene.qml
     qml/Main.qml
     qml/MainMenu.qml
+    qml/game/GroundLayer.qml
     qml/game/HeroSprite.qml
     qml/hud/GameHud.qml
     qml/hud/HudBar.qml
