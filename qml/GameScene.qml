@@ -41,7 +41,7 @@ Scene {
         HeroSprite {
             x: internal.heroX - width / 2
             y: internal.heroY - height / 2
-            animationName: internal.moving ? "walk" : "idle"
+            animationName: internal.sprinting ? "run" : internal.moving ? "walk" : "idle"
             facingDirection: internal.sheetDirection
             running: gameScene.visible
         }
@@ -67,29 +67,43 @@ Scene {
         anchors.fill: gameScene.gameWindowAnchorItem
         inputEnabled: gameScene.visible
         onMoveRequested: (x, y) => internal.setMovement(x, y)
+        onSprintRequested: sprinting => internal.setSprint(sprinting)
     }
 
-    // placeholder values until real gameplay fills the hud
     GameHud {
         anchors.fill: gameScene.gameWindowAnchorItem
         touchTargetSize: gameScene.dp(48)
         mana: 30
+        stamina: internal.stamina
+        maxStamina: internal.maxStamina
         onExitRequested: gameScene.exitRequested()
     }
 
     QtObject {
         id: internal
 
-        readonly property real movementSpeed: 120
+        readonly property real walkingSpeed: 120
+        readonly property real sprintingSpeed: 185
+        readonly property real maxStamina: 100
+        readonly property real staminaDrainRate: 30
+        readonly property real staminaRecoveryRate: 18
+        readonly property real sprintRecoveryThreshold: 20
         readonly property list<int> directionMap: [6, 7, 8, 1, 2, 3, 4, 5]
 
         property real heroX: 0
         property real heroY: 0
         property real moveX: 0
         property real moveY: 0
+        property real stamina: internal.maxStamina
+        property bool sprintHeld: false
+        property bool sprintExhausted: false
         property int facingOctant: 2
 
         readonly property bool moving: internal.moveX !== 0 || internal.moveY !== 0
+        readonly property bool sprinting: internal.moving
+                                            && internal.sprintHeld
+                                            && internal.stamina > 0
+                                            && !internal.sprintExhausted
         readonly property int sheetDirection: internal.directionMap[internal.facingOctant]
 
         function resetHero(): void {
@@ -97,6 +111,9 @@ Scene {
             internal.heroY = 0
             internal.moveX = 0
             internal.moveY = 0
+            internal.stamina = internal.maxStamina
+            internal.sprintHeld = false
+            internal.sprintExhausted = false
             internal.facingOctant = 2
         }
 
@@ -108,13 +125,37 @@ Scene {
                 internal.facingOctant = internal.octantFromDirection(x, y)
         }
 
+        function setSprint(sprinting: bool): void {
+            internal.sprintHeld = sprinting
+        }
+
         function advance(frameTime: real): void {
+            const sprintingThisFrame = internal.sprinting
+            internal.updateStamina(frameTime)
+
             if (!internal.moving)
                 return
 
-            const distance = internal.movementSpeed * frameTime
+            const speed = sprintingThisFrame ? internal.sprintingSpeed : internal.walkingSpeed
+            const distance = speed * frameTime
             internal.heroX += internal.moveX * distance
             internal.heroY += internal.moveY * distance
+        }
+
+        function updateStamina(frameTime: real): void {
+            if (internal.sprinting) {
+                internal.stamina = Math.max(0, internal.stamina
+                                                - internal.staminaDrainRate * frameTime)
+                if (internal.stamina === 0)
+                    internal.sprintExhausted = true
+                return
+            }
+
+            internal.stamina = Math.min(internal.maxStamina,
+                                        internal.stamina
+                                        + internal.staminaRecoveryRate * frameTime)
+            if (internal.stamina >= internal.sprintRecoveryThreshold)
+                internal.sprintExhausted = false
         }
 
         function octantFromDirection(x: real, y: real): int {

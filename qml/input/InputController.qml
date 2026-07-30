@@ -7,10 +7,29 @@ FocusScope {
     property bool inputEnabled: true
 
     signal moveRequested(real x, real y)
+    signal sprintRequested(bool sprinting)
 
     enabled: root.inputEnabled
     focus: root.inputEnabled
     Keys.forwardTo: [wasdController, arrowController]
+    Keys.onPressed: event => {
+        if (event.key !== Qt.Key_Shift) {
+            event.accepted = false
+            return
+        }
+
+        internal.publishSprint(true)
+        event.accepted = true
+    }
+    Keys.onReleased: event => {
+        if (event.key !== Qt.Key_Shift) {
+            event.accepted = false
+            return
+        }
+
+        internal.publishSprint(false)
+        event.accepted = true
+    }
 
     onInputEnabledChanged: {
         if (!internal.ready)
@@ -67,11 +86,13 @@ FocusScope {
         property bool ready: false
         property real publishedX: 0
         property real publishedY: 0
+        property bool publishedSprinting: false
 
         function releaseInput(): void {
             internal.resetController(wasdController)
             internal.resetController(arrowController)
             internal.publishMovement()
+            internal.publishSprint(false)
         }
 
         function resetController(controller: TwoAxisController): void {
@@ -100,6 +121,14 @@ FocusScope {
             internal.publishedX = x
             internal.publishedY = y
             root.moveRequested(x, y)
+        }
+
+        function publishSprint(sprinting: bool): void {
+            if (sprinting === internal.publishedSprinting)
+                return
+
+            internal.publishedSprinting = sprinting
+            root.sprintRequested(sprinting)
         }
     }
 }

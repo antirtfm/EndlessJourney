@@ -31,9 +31,5 @@ Item {
         height: parent.height - 2
         radius: 2
         color: root.barColor
-
-        Behavior on width {
-            NumberAnimation { duration: 80 }
-        }
     }
 }
