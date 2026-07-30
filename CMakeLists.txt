@@ -30,11 +30,13 @@ set(QmlFiles
     qml/GameScene.qml
     qml/Main.qml
     qml/MainMenu.qml
+    qml/components/GameActionButton.qml
     qml/config/Visuals.js
     qml/game/DirectionalSprite.qml
     qml/game/EnemyActor.qml
     qml/game/GroundLayer.qml
     qml/hud/GameHud.qml
+    qml/hud/GameOverDialog.qml
     qml/hud/HudBar.qml
     qml/input/InputController.qml
 )

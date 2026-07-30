@@ -5,6 +5,7 @@ FocusScope {
     id: root
 
     property bool inputEnabled: true
+    property real steeringDeadZone: 12
 
     signal moveRequested(real x, real y)
     signal sprintRequested(bool sprinting)
@@ -80,6 +81,24 @@ FocusScope {
         onYAxisChanged: internal.publishMovement()
     }
 
+    MouseArea {
+        id: pointerArea
+
+        anchors.fill: parent
+        acceptedButtons: Qt.LeftButton
+
+        onPressed: mouse => {
+            internal.steering = true
+            internal.updateSteering(mouse.x, mouse.y)
+        }
+        onPositionChanged: mouse => {
+            if (internal.steering)
+                internal.updateSteering(mouse.x, mouse.y)
+        }
+        onReleased: internal.stopSteering()
+        onCanceled: internal.stopSteering()
+    }
+
     QtObject {
         id: internal
 
@@ -87,10 +106,23 @@ FocusScope {
         property real publishedX: 0
         property real publishedY: 0
         property bool publishedSprinting: false
+        property bool steering: false
+        property real steerX: 0
+        property real steerY: 0
+
+        function stopSteering(): void {
+            internal.steering = false
+            internal.steerX = 0
+            internal.steerY = 0
+            internal.publishMovement()
+        }
 
         function releaseInput(): void {
             internal.resetController(wasdController)
             internal.resetController(arrowController)
+            internal.steering = false
+            internal.steerX = 0
+            internal.steerY = 0
             internal.publishMovement()
             internal.publishSprint(false)
         }
@@ -100,6 +132,21 @@ FocusScope {
             controller.setInputActionPressedStatus("down", false)
             controller.setInputActionPressedStatus("left", false)
             controller.setInputActionPressedStatus("right", false)
+        }
+
+        function updateSteering(mouseX: real, mouseY: real): void {
+            const dx = mouseX - pointerArea.width / 2
+            const dy = mouseY - pointerArea.height / 2
+            const length = Math.sqrt(dx * dx + dy * dy)
+
+            if (length < root.steeringDeadZone) {
+                internal.steerX = 0
+                internal.steerY = 0
+            } else {
+                internal.steerX = dx / length
+                internal.steerY = dy / length
+            }
+            internal.publishMovement()
         }
 
         function publishMovement(): void {
@@ -113,6 +160,11 @@ FocusScope {
             if (length > 1) {
                 x /= length
                 y /= length
+            }
+
+            if (x === 0 && y === 0 && internal.steering) {
+                x = internal.steerX
+                y = internal.steerY
             }
 
             if (x === internal.publishedX && y === internal.publishedY)

@@ -38,8 +38,12 @@ Item {
     implicitHeight: sprite.implicitHeight
 
     function reset(): void {
-        root.worldX = root.initialX
-        root.worldY = root.initialY
+        root.spawnAt(root.initialX, root.initialY)
+    }
+
+    function spawnAt(spawnX: real, spawnY: real): void {
+        root.worldX = spawnX
+        root.worldY = spawnY
         root.hp = root.maxHp
         root.facingOctant = internal.octantFromDirection(
                     root.targetX - root.worldX,

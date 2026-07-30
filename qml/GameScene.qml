@@ -42,6 +42,8 @@ Scene {
             z: 1
 
             DirectionalSprite {
+                id: heroSprite
+
                 x: internal.heroX - width / 2
                 y: internal.heroY - height / 2
                 z: internal.heroY
@@ -64,7 +66,7 @@ Scene {
                 maxHp: 30
                 attackDamage: 10
                 attackInterval: 0.9
-                running: gameScene.visible
+                running: gameScene.visible && internal.alive
                 onDamageRequested: damage => internal.applyDamage(damage)
             }
         }
@@ -82,13 +84,13 @@ Scene {
     }
 
     FrameAnimation {
-        running: gameScene.visible
+        running: gameScene.visible && !internal.gameOverVisible
         onTriggered: internal.advance(frameTime)
     }
 
     InputController {
         anchors.fill: gameScene.gameWindowAnchorItem
-        inputEnabled: gameScene.visible
+        inputEnabled: gameScene.visible && internal.alive
         onMoveRequested: (x, y) => internal.setMovement(x, y)
         onSprintRequested: sprinting => internal.setSprint(sprinting)
     }
@@ -102,6 +104,16 @@ Scene {
         stamina: internal.stamina
         maxStamina: internal.maxStamina
         kills: internal.kills
+        onExitRequested: gameScene.exitRequested()
+    }
+
+    GameOverDialog {
+        anchors.fill: gameScene.gameWindowAnchorItem
+        z: 10
+        opened: internal.gameOverVisible
+        kills: internal.kills
+        touchTargetSize: gameScene.dp(48)
+        onRestartRequested: internal.resetWorld()
         onExitRequested: gameScene.exitRequested()
     }
 
@@ -119,6 +131,8 @@ Scene {
         readonly property real heroAttackRate: 1.4
         readonly property real heroAttackRange: 78
         readonly property real attackAnimationDuration: 0.35
+        readonly property real enemyRespawnDelay: 1.25
+        readonly property real enemySpawnDistance: 180
 
         property real heroX: 0
         property real heroY: 0
@@ -131,15 +145,24 @@ Scene {
         property int facingOctant: 2
         property real attackCooldown: 0
         property real attackAnimationTime: 0
+        property real enemyRespawnTime: 0
+        property int nextSpawnOctant: 1
+        property real deathAnimationTime: 0
+        property bool gameOverVisible: false
         property int kills: 0
 
-        readonly property bool moving: internal.moveX !== 0 || internal.moveY !== 0
+        readonly property bool alive: internal.hp > 0
+        readonly property bool moving: internal.alive
+                                       && (internal.moveX !== 0
+                                           || internal.moveY !== 0)
         readonly property bool sprinting: internal.moving
                                             && internal.sprintHeld
                                             && internal.stamina > 0
                                             && !internal.sprintExhausted
-        readonly property bool attacking: internal.attackAnimationTime > 0
-        readonly property string heroAnimationName: internal.attacking ? "attack"
+        readonly property bool attacking: internal.alive
+                                          && internal.attackAnimationTime > 0
+        readonly property string heroAnimationName: !internal.alive ? "die"
+                                                      : internal.attacking ? "attack"
                                                       : internal.sprinting ? "run"
                                                       : internal.moving ? "walk"
                                                                         : "idle"
@@ -156,11 +179,18 @@ Scene {
             internal.facingOctant = 2
             internal.attackCooldown = 0
             internal.attackAnimationTime = 0
+            internal.enemyRespawnTime = 0
+            internal.nextSpawnOctant = 1
+            internal.deathAnimationTime = 0
+            internal.gameOverVisible = false
             internal.kills = 0
             bandit.reset()
         }
 
         function setMovement(x: real, y: real): void {
+            if (!internal.alive)
+                return
+
             internal.moveX = x
             internal.moveY = y
 
@@ -169,17 +199,27 @@ Scene {
         }
 
         function setSprint(sprinting: bool): void {
+            if (!internal.alive)
+                return
+
             internal.sprintHeld = sprinting
         }
 
         function applyDamage(damage: real): void {
-            if (damage <= 0)
+            if (!internal.alive || damage <= 0)
                 return
 
             internal.hp = Math.max(0, internal.hp - damage)
+            if (!internal.alive)
+                internal.beginHeroDeath()
         }
 
         function advance(frameTime: real): void {
+            if (!internal.alive) {
+                internal.updateHeroDeath(frameTime)
+                return
+            }
+
             const sprintingThisFrame = internal.sprinting
             internal.attackCooldown = Math.max(
                         0, internal.attackCooldown - frameTime)
@@ -199,8 +239,12 @@ Scene {
                 internal.heroY += internal.moveY * distance
             }
 
-            internal.tryAttackBandit()
-            bandit.advance(frameTime)
+            if (bandit.alive) {
+                internal.tryAttackBandit()
+                bandit.advance(frameTime)
+            } else {
+                internal.updateEnemyRespawn(frameTime)
+            }
         }
 
         function tryAttackBandit(): void {
@@ -218,7 +262,50 @@ Scene {
             internal.attackCooldown = 1 / internal.heroAttackRate
 
             if (bandit.takeDamage(internal.heroDamage))
-                internal.kills += 1
+                internal.handleBanditDefeated()
+        }
+
+        function handleBanditDefeated(): void {
+            internal.kills += 1
+            internal.enemyRespawnTime = internal.enemyRespawnDelay
+        }
+
+        function updateEnemyRespawn(frameTime: real): void {
+            internal.enemyRespawnTime = Math.max(
+                        0, internal.enemyRespawnTime - frameTime)
+            if (internal.enemyRespawnTime === 0)
+                internal.spawnNextBandit()
+        }
+
+        function spawnNextBandit(): void {
+            const angle = internal.nextSpawnOctant * Math.PI / 4
+            const spawnX = internal.heroX
+                    + Math.cos(angle) * internal.enemySpawnDistance
+            const spawnY = internal.heroY
+                    + Math.sin(angle) * internal.enemySpawnDistance
+
+            bandit.spawnAt(spawnX, spawnY)
+            internal.nextSpawnOctant = (internal.nextSpawnOctant + 1) % 8
+        }
+
+        function beginHeroDeath(): void {
+            internal.moveX = 0
+            internal.moveY = 0
+            internal.sprintHeld = false
+            internal.attackCooldown = 0
+            internal.attackAnimationTime = 0
+            internal.deathAnimationTime = heroSprite.animationDuration
+            internal.gameOverVisible = internal.deathAnimationTime <= 0
+        }
+
+        function updateHeroDeath(frameTime: real): void {
+            if (internal.gameOverVisible)
+                return
+
+            internal.deathAnimationTime = Math.max(
+                        0, internal.deathAnimationTime - frameTime)
+            if (internal.deathAnimationTime === 0)
+                internal.gameOverVisible = true
         }
 
         function updateStamina(frameTime: real): void {
