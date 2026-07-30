@@ -52,6 +52,11 @@ var configs = {
                 pattern: "enemies/bandit/Walk/Bandit_Walk_dir{dir}.png",
                 frameCount: 12,
                 fps: 12
+            },
+            attack: {
+                pattern: "enemies/bandit/Attack/Bandit_Attack_dir{dir}.png",
+                frameCount: 12,
+                fps: 15
             }
         }
     }

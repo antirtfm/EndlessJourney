@@ -62,7 +62,10 @@ Scene {
                 moveSpeed: 55
                 contactDistance: 27
                 maxHp: 30
+                attackDamage: 10
+                attackInterval: 0.9
                 running: gameScene.visible
+                onDamageRequested: damage => internal.applyDamage(damage)
             }
         }
     }
@@ -93,6 +96,8 @@ Scene {
     GameHud {
         anchors.fill: gameScene.gameWindowAnchorItem
         touchTargetSize: gameScene.dp(48)
+        hp: internal.hp
+        maxHp: internal.maxHp
         mana: 30
         stamina: internal.stamina
         maxStamina: internal.maxStamina
@@ -109,6 +114,7 @@ Scene {
         readonly property real staminaDrainRate: 30
         readonly property real staminaRecoveryRate: 18
         readonly property real sprintRecoveryThreshold: 20
+        readonly property real maxHp: 100
         readonly property real heroDamage: 12
         readonly property real heroAttackRate: 1.4
         readonly property real heroAttackRange: 78
@@ -119,6 +125,7 @@ Scene {
         property real moveX: 0
         property real moveY: 0
         property real stamina: internal.maxStamina
+        property real hp: internal.maxHp
         property bool sprintHeld: false
         property bool sprintExhausted: false
         property int facingOctant: 2
@@ -143,6 +150,7 @@ Scene {
             internal.moveX = 0
             internal.moveY = 0
             internal.stamina = internal.maxStamina
+            internal.hp = internal.maxHp
             internal.sprintHeld = false
             internal.sprintExhausted = false
             internal.facingOctant = 2
@@ -162,6 +170,13 @@ Scene {
 
         function setSprint(sprinting: bool): void {
             internal.sprintHeld = sprinting
+        }
+
+        function applyDamage(damage: real): void {
+            if (damage <= 0)
+                return
+
+            internal.hp = Math.max(0, internal.hp - damage)
         }
 
         function advance(frameTime: real): void {

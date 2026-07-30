@@ -13,6 +13,10 @@ Item {
 
     implicitWidth: internal.config.renderSize
     implicitHeight: implicitWidth
+    readonly property real animationDuration: internal.animation.fps > 0
+                                              ? internal.animation.frameCount
+                                                / internal.animation.fps
+                                              : 0
 
     GameAnimatedSprite {
         anchors.fill: parent

@@ -11,6 +11,8 @@ Item {
     required property real moveSpeed
     required property real contactDistance
     required property real maxHp
+    required property real attackDamage
+    required property real attackInterval
 
     property bool running: true
     property real worldX: root.initialX
@@ -21,7 +23,12 @@ Item {
     readonly property bool alive: root.hp > 0
     readonly property real hpRatio: root.maxHp > 0 ? root.hp / root.maxHp : 0
     readonly property bool moving: root.alive
+                                   && !root.attacking
                                    && internal.distance > root.contactDistance
+    readonly property bool attacking: root.alive
+                                      && internal.attackAnimationTime > 0
+
+    signal damageRequested(real damage)
 
     visible: root.alive
     x: root.worldX - width / 2
@@ -38,6 +45,8 @@ Item {
                     root.targetX - root.worldX,
                     root.targetY - root.worldY,
                     4)
+        internal.attackCooldown = 0
+        internal.attackAnimationTime = 0
     }
 
     function takeDamage(damage: real): bool {
@@ -52,6 +61,11 @@ Item {
         if (!root.running || !root.alive)
             return
 
+        internal.attackCooldown = Math.max(
+                    0, internal.attackCooldown - frameTime)
+        internal.attackAnimationTime = Math.max(
+                    0, internal.attackAnimationTime - frameTime)
+
         const dx = root.targetX - root.worldX
         const dy = root.targetY - root.worldY
         const distance = Math.sqrt(dx * dx + dy * dy)
@@ -59,8 +73,13 @@ Item {
         root.facingOctant = internal.octantFromDirection(
                     dx, dy, root.facingOctant)
 
-        if (distance <= root.contactDistance || distance === 0)
+        if (root.attacking)
             return
+
+        if (distance <= root.contactDistance || distance === 0) {
+            internal.tryAttack()
+            return
+        }
 
         const travelDistance = Math.min(root.moveSpeed * frameTime,
                                         distance - root.contactDistance)
@@ -74,7 +93,9 @@ Item {
         anchors.fill: parent
         entityKind: root.entityKind
         octant: root.facingOctant
-        animationName: root.moving ? "walk" : "idle"
+        animationName: root.attacking ? "attack"
+                                      : root.moving ? "walk"
+                                                    : "idle"
         running: root.running && root.alive
     }
 
@@ -102,6 +123,17 @@ Item {
         readonly property real dy: root.targetY - root.worldY
         readonly property real distance: Math.sqrt(internal.dx * internal.dx
                                                    + internal.dy * internal.dy)
+        property real attackCooldown: 0
+        property real attackAnimationTime: 0
+
+        function tryAttack(): void {
+            if (internal.attackCooldown > 0 || root.attackDamage <= 0)
+                return
+
+            internal.attackCooldown = Math.max(0, root.attackInterval)
+            internal.attackAnimationTime = sprite.animationDuration
+            root.damageRequested(root.attackDamage)
+        }
 
         function octantFromDirection(x: real, y: real, fallback: int): int {
             if (x === 0 && y === 0)
