@@ -1,5 +1,7 @@
 import QtQuick
 
+import "../util"
+
 // In-game overlay: resource bars, level/xp, timer and kill counter.
 Item {
     id: root
@@ -18,13 +20,6 @@ Item {
     property real elapsed: 0
 
     signal exitRequested()
-
-    function formatTime(seconds: real): string {
-        const total = Math.floor(seconds)
-        const minutes = Math.floor(total / 60)
-        const remainingSeconds = total % 60
-        return minutes + ":" + (remainingSeconds < 10 ? "0" : "") + remainingSeconds
-    }
 
     Column {
         anchors.left: parent.left
@@ -82,7 +77,7 @@ Item {
 
         Text {
             anchors.right: parent.right
-            text: root.formatTime(root.elapsed)
+            text: timeFormatter.duration(root.elapsed)
             color: "#e8e8f0"
             font.pixelSize: 18
             font.bold: true
@@ -134,5 +129,9 @@ Item {
                 onClicked: root.exitRequested()
             }
         }
+    }
+
+    TimeFormatter {
+        id: timeFormatter
     }
 }

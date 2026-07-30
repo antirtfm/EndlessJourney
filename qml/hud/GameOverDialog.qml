@@ -1,12 +1,15 @@
 import QtQuick
 
 import "../components"
+import "../util"
 
 FocusScope {
     id: root
 
     required property bool opened
     required property int kills
+    required property int level
+    required property real elapsed
     required property real touchTargetSize
 
     signal restartRequested()
@@ -44,7 +47,10 @@ FocusScope {
 
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
-            text: qsTr("Kills: %1").arg(root.kills)
+            text: qsTr("Survived %1 | Level %2 | Kills: %3")
+                    .arg(timeFormatter.duration(root.elapsed))
+                    .arg(root.level)
+                    .arg(root.kills)
             color: "#e8e8f0"
             font.pixelSize: 14
         }
@@ -73,5 +79,9 @@ FocusScope {
                 onClicked: root.exitRequested()
             }
         }
+    }
+
+    TimeFormatter {
+        id: timeFormatter
     }
 }

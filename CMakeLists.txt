@@ -35,10 +35,12 @@ set(QmlFiles
     qml/game/DirectionalSprite.qml
     qml/game/EnemyActor.qml
     qml/game/GroundLayer.qml
+    qml/game/LevelUpFx.qml
     qml/hud/GameHud.qml
     qml/hud/GameOverDialog.qml
     qml/hud/HudBar.qml
     qml/input/InputController.qml
+    qml/util/TimeFormatter.qml
 )
 
 file(GLOB_RECURSE AssetFiles CONFIGURE_DEPENDS

@@ -66,8 +66,16 @@ Scene {
                 maxHp: 30
                 attackDamage: 10
                 attackInterval: 0.9
+                xpReward: 3
                 running: gameScene.visible && internal.alive
                 onDamageRequested: damage => internal.applyDamage(damage)
+            }
+
+            LevelUpFx {
+                id: levelUpFx
+
+                targetX: internal.heroX
+                targetY: internal.heroY
             }
         }
     }
@@ -103,7 +111,11 @@ Scene {
         mana: 30
         stamina: internal.stamina
         maxStamina: internal.maxStamina
+        xp: internal.xp
+        xpToNext: internal.xpToNext
+        level: internal.level
         kills: internal.kills
+        elapsed: internal.elapsed
         onExitRequested: gameScene.exitRequested()
     }
 
@@ -112,6 +124,8 @@ Scene {
         z: 10
         opened: internal.gameOverVisible
         kills: internal.kills
+        level: internal.level
+        elapsed: internal.elapsed
         touchTargetSize: gameScene.dp(48)
         onRestartRequested: internal.resetWorld()
         onExitRequested: gameScene.exitRequested()
@@ -133,6 +147,8 @@ Scene {
         readonly property real attackAnimationDuration: 0.35
         readonly property real enemyRespawnDelay: 1.25
         readonly property real enemySpawnDistance: 180
+        readonly property real xpBase: 10
+        readonly property real xpPerLevel: 8
 
         property real heroX: 0
         property real heroY: 0
@@ -149,9 +165,15 @@ Scene {
         property int nextSpawnOctant: 1
         property real deathAnimationTime: 0
         property bool gameOverVisible: false
+        property real elapsed: 0
+        property real xp: 0
+        property int level: 1
         property int kills: 0
 
         readonly property bool alive: internal.hp > 0
+        readonly property real xpToNext: internal.xpBase
+                                         + internal.xpPerLevel
+                                         * (internal.level - 1)
         readonly property bool moving: internal.alive
                                        && (internal.moveX !== 0
                                            || internal.moveY !== 0)
@@ -183,8 +205,12 @@ Scene {
             internal.nextSpawnOctant = 1
             internal.deathAnimationTime = 0
             internal.gameOverVisible = false
+            internal.elapsed = 0
+            internal.xp = 0
+            internal.level = 1
             internal.kills = 0
             bandit.reset()
+            levelUpFx.reset()
         }
 
         function setMovement(x: real, y: real): void {
@@ -220,6 +246,7 @@ Scene {
                 return
             }
 
+            internal.elapsed += frameTime
             const sprintingThisFrame = internal.sprinting
             internal.attackCooldown = Math.max(
                         0, internal.attackCooldown - frameTime)
@@ -267,7 +294,25 @@ Scene {
 
         function handleBanditDefeated(): void {
             internal.kills += 1
+            internal.awardExperience(bandit.xpReward)
             internal.enemyRespawnTime = internal.enemyRespawnDelay
+        }
+
+        function awardExperience(amount: real): void {
+            if (amount <= 0)
+                return
+
+            internal.xp += amount
+            let levelsGained = 0
+            while (internal.xp >= internal.xpToNext) {
+                const threshold = internal.xpToNext
+                internal.xp -= threshold
+                internal.level += 1
+                levelsGained += 1
+            }
+
+            if (levelsGained > 0)
+                levelUpFx.play()
         }
 
         function updateEnemyRespawn(frameTime: real): void {

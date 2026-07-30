@@ -13,6 +13,7 @@ Item {
     required property real maxHp
     required property real attackDamage
     required property real attackInterval
+    required property real xpReward
 
     property bool running: true
     property real worldX: root.initialX
