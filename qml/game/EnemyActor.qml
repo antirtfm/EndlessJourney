@@ -10,14 +10,20 @@ Item {
     required property string entityKind
     required property real moveSpeed
     required property real contactDistance
+    required property real maxHp
 
     property bool running: true
     property real worldX: root.initialX
     property real worldY: root.initialY
+    property real hp: root.maxHp
     property int facingOctant: 4
 
-    readonly property bool moving: internal.distance > root.contactDistance
+    readonly property bool alive: root.hp > 0
+    readonly property real hpRatio: root.maxHp > 0 ? root.hp / root.maxHp : 0
+    readonly property bool moving: root.alive
+                                   && internal.distance > root.contactDistance
 
+    visible: root.alive
     x: root.worldX - width / 2
     y: root.worldY - height / 2
     z: root.worldY
@@ -27,14 +33,23 @@ Item {
     function reset(): void {
         root.worldX = root.initialX
         root.worldY = root.initialY
+        root.hp = root.maxHp
         root.facingOctant = internal.octantFromDirection(
                     root.targetX - root.worldX,
                     root.targetY - root.worldY,
                     4)
     }
 
+    function takeDamage(damage: real): bool {
+        if (!root.alive || damage <= 0)
+            return false
+
+        root.hp = Math.max(0, root.hp - damage)
+        return !root.alive
+    }
+
     function advance(frameTime: real): void {
-        if (!root.running)
+        if (!root.running || !root.alive)
             return
 
         const dx = root.targetX - root.worldX
@@ -60,7 +75,24 @@ Item {
         entityKind: root.entityKind
         octant: root.facingOctant
         animationName: root.moving ? "walk" : "idle"
-        running: root.running
+        running: root.running && root.alive
+    }
+
+    Rectangle {
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: -2
+        width: 26
+        height: 3
+        radius: 1
+        color: "#40000000"
+        visible: root.alive && root.hp < root.maxHp
+
+        Rectangle {
+            width: parent.width * Math.max(0, Math.min(1, root.hpRatio))
+            height: parent.height
+            radius: parent.radius
+            color: "#e63946"
+        }
     }
 
     QtObject {

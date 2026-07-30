@@ -47,13 +47,10 @@ Scene {
                 z: internal.heroY
                 entityKind: "hero"
                 octant: internal.facingOctant
-                animationName: internal.sprinting ? "run"
-                                                    : internal.moving ? "walk"
-                                                                      : "idle"
+                animationName: internal.heroAnimationName
                 running: gameScene.visible
             }
 
-            // First encounter: pursuit and animation, without combat yet.
             EnemyActor {
                 id: bandit
 
@@ -64,6 +61,7 @@ Scene {
                 entityKind: "bandit"
                 moveSpeed: 55
                 contactDistance: 27
+                maxHp: 30
                 running: gameScene.visible
             }
         }
@@ -98,6 +96,7 @@ Scene {
         mana: 30
         stamina: internal.stamina
         maxStamina: internal.maxStamina
+        kills: internal.kills
         onExitRequested: gameScene.exitRequested()
     }
 
@@ -110,6 +109,10 @@ Scene {
         readonly property real staminaDrainRate: 30
         readonly property real staminaRecoveryRate: 18
         readonly property real sprintRecoveryThreshold: 20
+        readonly property real heroDamage: 12
+        readonly property real heroAttackRate: 1.4
+        readonly property real heroAttackRange: 78
+        readonly property real attackAnimationDuration: 0.35
 
         property real heroX: 0
         property real heroY: 0
@@ -119,12 +122,20 @@ Scene {
         property bool sprintHeld: false
         property bool sprintExhausted: false
         property int facingOctant: 2
+        property real attackCooldown: 0
+        property real attackAnimationTime: 0
+        property int kills: 0
 
         readonly property bool moving: internal.moveX !== 0 || internal.moveY !== 0
         readonly property bool sprinting: internal.moving
                                             && internal.sprintHeld
                                             && internal.stamina > 0
                                             && !internal.sprintExhausted
+        readonly property bool attacking: internal.attackAnimationTime > 0
+        readonly property string heroAnimationName: internal.attacking ? "attack"
+                                                      : internal.sprinting ? "run"
+                                                      : internal.moving ? "walk"
+                                                                        : "idle"
 
         function resetWorld(): void {
             internal.heroX = 0
@@ -135,6 +146,9 @@ Scene {
             internal.sprintHeld = false
             internal.sprintExhausted = false
             internal.facingOctant = 2
+            internal.attackCooldown = 0
+            internal.attackAnimationTime = 0
+            internal.kills = 0
             bandit.reset()
         }
 
@@ -142,7 +156,7 @@ Scene {
             internal.moveX = x
             internal.moveY = y
 
-            if (x !== 0 || y !== 0)
+            if ((x !== 0 || y !== 0) && !internal.attacking)
                 internal.facingOctant = internal.octantFromDirection(x, y)
         }
 
@@ -152,9 +166,17 @@ Scene {
 
         function advance(frameTime: real): void {
             const sprintingThisFrame = internal.sprinting
+            internal.attackCooldown = Math.max(
+                        0, internal.attackCooldown - frameTime)
+            internal.attackAnimationTime = Math.max(
+                        0, internal.attackAnimationTime - frameTime)
             internal.updateStamina(frameTime)
 
             if (internal.moving) {
+                if (!internal.attacking)
+                    internal.facingOctant = internal.octantFromDirection(
+                                internal.moveX, internal.moveY)
+
                 const speed = sprintingThisFrame ? internal.sprintingSpeed
                                                   : internal.walkingSpeed
                 const distance = speed * frameTime
@@ -162,7 +184,26 @@ Scene {
                 internal.heroY += internal.moveY * distance
             }
 
+            internal.tryAttackBandit()
             bandit.advance(frameTime)
+        }
+
+        function tryAttackBandit(): void {
+            if (!bandit.alive || internal.attackCooldown > 0)
+                return
+
+            const dx = bandit.worldX - internal.heroX
+            const dy = bandit.worldY - internal.heroY
+            const distance = Math.sqrt(dx * dx + dy * dy)
+            if (distance > internal.heroAttackRange)
+                return
+
+            internal.facingOctant = internal.octantFromDirection(dx, dy)
+            internal.attackAnimationTime = internal.attackAnimationDuration
+            internal.attackCooldown = 1 / internal.heroAttackRate
+
+            if (bandit.takeDamage(internal.heroDamage))
+                internal.kills += 1
         }
 
         function updateStamina(frameTime: real): void {
