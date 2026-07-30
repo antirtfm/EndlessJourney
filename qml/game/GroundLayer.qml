@@ -23,7 +23,7 @@ Item {
 
             x: tile.column * internal.tileSize
             y: tile.row * internal.tileSize
-            width: internal.tileSize + 1 // +1 avoids hairline seams between tiles
+            width: internal.tileSize + 1
             height: internal.tileSize + 1
             color: Qt.hsla(0.34 - tile.shade * 0.03,
                            0.25,

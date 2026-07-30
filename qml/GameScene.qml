@@ -17,7 +17,7 @@ Scene {
     onBackButtonPressed: gameScene.exitRequested()
     onVisibleChanged: {
         if (gameScene.visible)
-            internal.resetHero()
+            internal.resetWorld()
     }
 
     Rectangle {
@@ -38,12 +38,34 @@ Scene {
             viewHeight: gameScene.gameWindowAnchorItem.height
         }
 
-        HeroSprite {
-            x: internal.heroX - width / 2
-            y: internal.heroY - height / 2
-            animationName: internal.sprinting ? "run" : internal.moving ? "walk" : "idle"
-            facingDirection: internal.sheetDirection
-            running: gameScene.visible
+        Item {
+            z: 1
+
+            DirectionalSprite {
+                x: internal.heroX - width / 2
+                y: internal.heroY - height / 2
+                z: internal.heroY
+                entityKind: "hero"
+                octant: internal.facingOctant
+                animationName: internal.sprinting ? "run"
+                                                    : internal.moving ? "walk"
+                                                                      : "idle"
+                running: gameScene.visible
+            }
+
+            // First encounter: pursuit and animation, without combat yet.
+            EnemyActor {
+                id: bandit
+
+                targetX: internal.heroX
+                targetY: internal.heroY
+                initialX: 180
+                initialY: 0
+                entityKind: "bandit"
+                moveSpeed: 55
+                contactDistance: 27
+                running: gameScene.visible
+            }
         }
     }
 
@@ -88,7 +110,6 @@ Scene {
         readonly property real staminaDrainRate: 30
         readonly property real staminaRecoveryRate: 18
         readonly property real sprintRecoveryThreshold: 20
-        readonly property list<int> directionMap: [6, 7, 8, 1, 2, 3, 4, 5]
 
         property real heroX: 0
         property real heroY: 0
@@ -104,9 +125,8 @@ Scene {
                                             && internal.sprintHeld
                                             && internal.stamina > 0
                                             && !internal.sprintExhausted
-        readonly property int sheetDirection: internal.directionMap[internal.facingOctant]
 
-        function resetHero(): void {
+        function resetWorld(): void {
             internal.heroX = 0
             internal.heroY = 0
             internal.moveX = 0
@@ -115,6 +135,7 @@ Scene {
             internal.sprintHeld = false
             internal.sprintExhausted = false
             internal.facingOctant = 2
+            bandit.reset()
         }
 
         function setMovement(x: real, y: real): void {
@@ -133,13 +154,15 @@ Scene {
             const sprintingThisFrame = internal.sprinting
             internal.updateStamina(frameTime)
 
-            if (!internal.moving)
-                return
+            if (internal.moving) {
+                const speed = sprintingThisFrame ? internal.sprintingSpeed
+                                                  : internal.walkingSpeed
+                const distance = speed * frameTime
+                internal.heroX += internal.moveX * distance
+                internal.heroY += internal.moveY * distance
+            }
 
-            const speed = sprintingThisFrame ? internal.sprintingSpeed : internal.walkingSpeed
-            const distance = speed * frameTime
-            internal.heroX += internal.moveX * distance
-            internal.heroY += internal.moveY * distance
+            bandit.advance(frameTime)
         }
 
         function updateStamina(frameTime: real): void {
