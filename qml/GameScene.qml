@@ -14,8 +14,13 @@ Scene {
     width: 480
     height: 320
 
-    Keys.onEscapePressed: gameScene.engine.quitToMenu()
-    onBackButtonPressed: gameScene.engine.quitToMenu()
+    onBackButtonPressed: {
+        if (gameScene.engine.state === GameState.Playing
+                || gameScene.engine.state === GameState.Paused)
+            gameScene.engine.togglePause()
+        else
+            gameScene.engine.quitToMenu()
+    }
 
     Rectangle {
         anchors.fill: gameScene.fullWindowAnchorItem
@@ -71,6 +76,7 @@ Scene {
         onMoveRequested: (x, y) => gameScene.engine.setMoveInput(x, y)
         onSprintRequested: sprinting => gameScene.engine.setSprint(sprinting)
         onCastRequested: gameScene.engine.castNova()
+        onPauseRequested: gameScene.engine.togglePause()
     }
 
     GameHud {
@@ -86,9 +92,16 @@ Scene {
         engine: gameScene.engine
     }
 
-    GameOverDialog {
+    PauseOverlay {
         anchors.fill: gameScene.gameWindowAnchorItem
         z: 11
+        engine: gameScene.engine
+        touchTargetSize: gameScene.dp(48)
+    }
+
+    GameOverDialog {
+        anchors.fill: gameScene.gameWindowAnchorItem
+        z: 12
         engine: gameScene.engine
         touchTargetSize: gameScene.dp(48)
     }

@@ -42,6 +42,7 @@ set(QmlFiles
     qml/hud/GameHud.qml
     qml/hud/GameOverDialog.qml
     qml/hud/HudBar.qml
+    qml/hud/PauseOverlay.qml
     qml/hud/PowerupDialog.qml
     qml/input/InputController.qml
     qml/util/TimeFormatter.qml

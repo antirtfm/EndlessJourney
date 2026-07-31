@@ -64,6 +64,7 @@ public:
     Q_INVOKABLE void castNova();
     Q_INVOKABLE void selectPowerup(int id);
     Q_INVOKABLE void rerollPowerups();
+    Q_INVOKABLE void togglePause();
     Q_INVOKABLE void quitToMenu();
 
 signals:

@@ -12,6 +12,7 @@ enum class Value {
     Menu,
     Playing,
     LevelUp,
+    Paused,
     Dying,
     GameOver,
 };
@@ -25,6 +26,7 @@ public:
 
     enum class Event {
         StartGame,
+        TogglePause,
         LevelReached,
         PowerupSelected,
         HeroDied,

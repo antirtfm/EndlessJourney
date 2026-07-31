@@ -10,6 +10,7 @@ FocusScope {
     signal moveRequested(real x, real y)
     signal sprintRequested(bool sprinting)
     signal castRequested()
+    signal pauseRequested()
 
     enabled: root.inputEnabled
     focus: root.inputEnabled
@@ -24,6 +25,11 @@ FocusScope {
             // A held key auto-repeats, which would empty the mana pool at once.
             if (!event.isAutoRepeat)
                 root.castRequested()
+            event.accepted = true
+            return
+        case Qt.Key_Escape:
+            if (!event.isAutoRepeat)
+                root.pauseRequested()
             event.accepted = true
             return
         default:

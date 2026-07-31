@@ -108,6 +108,17 @@ void GameEngine::selectPowerup(int id)
     emit frameUpdated();
 }
 
+void GameEngine::togglePause()
+{
+    if (!m_stateMachine.dispatch(Event::TogglePause))
+        return;
+
+    if (state() == State::Paused)
+        m_world.clearInput();
+
+    emit stateChanged();
+}
+
 void GameEngine::rerollPowerups()
 {
     if (state() != State::LevelUp || m_rerollsLeft <= 0)
