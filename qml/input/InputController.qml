@@ -9,18 +9,26 @@ FocusScope {
 
     signal moveRequested(real x, real y)
     signal sprintRequested(bool sprinting)
+    signal castRequested()
 
     enabled: root.inputEnabled
     focus: root.inputEnabled
     Keys.forwardTo: [wasdController, arrowController]
     Keys.onPressed: event => {
-        if (event.key !== Qt.Key_Shift) {
-            event.accepted = false
+        switch (event.key) {
+        case Qt.Key_Shift:
+            internal.publishSprint(true)
+            event.accepted = true
             return
+        case Qt.Key_Space:
+            // A held key auto-repeats, which would empty the mana pool at once.
+            if (!event.isAutoRepeat)
+                root.castRequested()
+            event.accepted = true
+            return
+        default:
+            event.accepted = false
         }
-
-        internal.publishSprint(true)
-        event.accepted = true
     }
     Keys.onReleased: event => {
         if (event.key !== Qt.Key_Shift) {
@@ -85,9 +93,14 @@ FocusScope {
         id: pointerArea
 
         anchors.fill: parent
-        acceptedButtons: Qt.LeftButton
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
 
         onPressed: mouse => {
+            if (mouse.button === Qt.RightButton) {
+                root.castRequested()
+                return
+            }
+
             internal.steering = true
             internal.updateSteering(mouse.x, mouse.y)
         }
@@ -95,7 +108,10 @@ FocusScope {
             if (internal.steering)
                 internal.updateSteering(mouse.x, mouse.y)
         }
-        onReleased: internal.stopSteering()
+        onReleased: mouse => {
+            if (mouse.button === Qt.LeftButton)
+                internal.stopSteering()
+        }
         onCanceled: internal.stopSteering()
     }
 

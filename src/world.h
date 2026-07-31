@@ -2,6 +2,7 @@
 
 #include "entity.h"
 
+#include <optional>
 #include <vector>
 
 class CombatSystem;
@@ -16,12 +17,20 @@ public:
         float moveX = 0.0f;
         float moveY = 0.0f;
         bool sprint = false;
+        bool castNova = false;
+    };
+
+    struct NovaBlast {
+        float x = 0.0f;
+        float y = 0.0f;
+        float radius = 0.0f;
     };
 
     struct StepEvents {
         int enemiesDied = 0;
         int levelsGained = 0;
         bool heroDied = false;
+        std::optional<NovaBlast> novaBlast;
     };
 
     World();
@@ -30,6 +39,7 @@ public:
     StepEvents step(float deltaSeconds);
     void setMoveInput(float x, float y) noexcept;
     void setSprint(bool sprinting) noexcept;
+    void requestNova() noexcept;
     void clearInput() noexcept;
 
     float xpToNext() const noexcept;

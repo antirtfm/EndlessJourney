@@ -66,6 +66,14 @@ void GameEngine::setSprint(bool sprinting)
     m_world.setSprint(state() == State::Playing && sprinting);
 }
 
+void GameEngine::castNova()
+{
+    if (state() != State::Playing)
+        return;
+
+    m_world.requestNova();
+}
+
 void GameEngine::quitToMenu()
 {
     if (!m_stateMachine.dispatch(Event::ReturnToMenu))
@@ -85,6 +93,10 @@ void GameEngine::advancePlaying(qreal deltaSeconds)
         m_accumulator -= Balance::fixedStep;
         const World::StepEvents events = m_world.step(Balance::fixedStep);
 
+        if (events.novaBlast) {
+            emit novaFired(events.novaBlast->x, events.novaBlast->y,
+                           events.novaBlast->radius);
+        }
         if (events.levelsGained > 0)
             emit leveledUp(m_world.level());
         if (events.heroDied)

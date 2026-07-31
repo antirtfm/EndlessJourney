@@ -17,10 +17,18 @@ inline constexpr float heroAttackRange = 78.0f;
 inline constexpr float heroAttackAnimDuration = 0.35f;
 inline constexpr float heroDeathAnimDuration = 27.0f / 7.0f;
 inline constexpr float heroMaxMana = 50.0f;
+inline constexpr float heroManaRegen = 4.0f;
 inline constexpr float heroMaxStamina = 100.0f;
 inline constexpr float staminaDrain = 30.0f;
 inline constexpr float staminaRegen = 18.0f;
 inline constexpr float staminaRecoveryThreshold = 20.0f;
+
+inline constexpr float novaManaCost = 30.0f;
+inline constexpr float novaDamage = 45.0f;
+inline constexpr float novaRadius = 95.0f;
+
+// The run opens with exactly one nova in the tank.
+inline constexpr float heroStartMana = novaManaCost;
 
 struct EnemyDefinition {
     EntityKind kind;

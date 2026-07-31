@@ -40,6 +40,10 @@ Scene {
             running: gameScene.visible
         }
 
+        NovaFx {
+            engine: gameScene.engine
+        }
+
         LevelUpFx {
             engine: gameScene.engine
         }
@@ -48,12 +52,10 @@ Scene {
     Text {
         anchors.left: parent.left
         anchors.bottom: parent.bottom
-        anchors.margins: 10
-        text: qsTr("Position: %1, %2")
-                .arg(Math.round(gameScene.engine.heroX))
-                .arg(Math.round(gameScene.engine.heroY))
+        anchors.margins: 8
+        text: qsTr("WASD / arrows / hold mouse — move · Shift — sprint · Space / RMB — nova")
         color: "#8d99ae"
-        font.pixelSize: 11
+        font.pixelSize: 9
     }
 
     FrameAnimation {
@@ -68,6 +70,7 @@ Scene {
                       && gameScene.engine.state === GameState.Playing
         onMoveRequested: (x, y) => gameScene.engine.setMoveInput(x, y)
         onSprintRequested: sprinting => gameScene.engine.setSprint(sprinting)
+        onCastRequested: gameScene.engine.castNova()
     }
 
     GameHud {

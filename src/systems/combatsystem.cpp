@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <utility>
 
 void CombatSystem::stepHeroAttack(World& world, float deltaSeconds)
 {
@@ -38,6 +39,36 @@ void CombatSystem::stepHeroAttack(World& world, float deltaSeconds)
     hero.octant = SimulationMath::octantFromDirection(
         target->x - hero.x, target->y - hero.y, hero.octant);
     world.m_heroAttackCooldown = 1.0f / Balance::heroAttackRate;
+}
+
+void CombatSystem::stepNova(World& world, float deltaSeconds,
+                            World::StepEvents& events)
+{
+    world.m_mana = std::min(
+        world.m_maxMana,
+        world.m_mana + Balance::heroManaRegen * deltaSeconds);
+
+    if (!std::exchange(world.m_input.castNova, false))
+        return;
+    if (world.m_mana < Balance::novaManaCost)
+        return;
+
+    world.m_mana -= Balance::novaManaCost;
+
+    const Entity& hero = world.hero();
+    for (std::size_t index = 1; index < world.m_entities.size(); ++index) {
+        Entity& enemy = world.m_entities[index];
+        if (!isEnemy(enemy) || enemy.hp <= 0.0f)
+            continue;
+        if (SimulationMath::distance(hero, enemy) <= Balance::novaRadius)
+            enemy.hp -= Balance::novaDamage;
+    }
+
+    events.novaBlast = World::NovaBlast {
+        hero.x,
+        hero.y,
+        Balance::novaRadius,
+    };
 }
 
 void CombatSystem::resolveDeaths(World& world, World::StepEvents& events)

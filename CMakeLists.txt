@@ -37,6 +37,7 @@ set(QmlFiles
     qml/game/EntityView.qml
     qml/game/GroundLayer.qml
     qml/game/LevelUpFx.qml
+    qml/game/NovaFx.qml
     qml/game/WorldLayer.qml
     qml/hud/GameHud.qml
     qml/hud/GameOverDialog.qml

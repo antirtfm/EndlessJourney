@@ -15,7 +15,7 @@ void World::reset()
     m_maxHp = Balance::heroMaxHp;
     m_hp = m_maxHp;
     m_maxMana = Balance::heroMaxMana;
-    m_mana = 30.0f;
+    m_mana = Balance::heroStartMana;
     m_maxStamina = Balance::heroMaxStamina;
     m_stamina = m_maxStamina;
     m_xp = 0.0f;
@@ -53,6 +53,7 @@ World::StepEvents World::step(float deltaSeconds)
     m_elapsed += deltaSeconds;
     MovementSystem::step(*this, deltaSeconds);
     CombatSystem::stepHeroAttack(*this, deltaSeconds);
+    CombatSystem::stepNova(*this, deltaSeconds, events);
     EnemyBehaviorSystem::step(*this, deltaSeconds);
     SpawnSystem::step(*this, deltaSeconds);
     CombatSystem::resolveDeaths(*this, events);
@@ -69,6 +70,11 @@ void World::setMoveInput(float x, float y) noexcept
 void World::setSprint(bool sprinting) noexcept
 {
     m_input.sprint = sprinting;
+}
+
+void World::requestNova() noexcept
+{
+    m_input.castNova = true;
 }
 
 void World::clearInput() noexcept

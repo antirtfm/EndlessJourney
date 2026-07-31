@@ -51,6 +51,7 @@ public:
     Q_INVOKABLE void advance(qreal deltaMilliseconds);
     Q_INVOKABLE void setMoveInput(qreal x, qreal y);
     Q_INVOKABLE void setSprint(bool sprinting);
+    Q_INVOKABLE void castNova();
     Q_INVOKABLE void quitToMenu();
 
 signals:
@@ -58,6 +59,7 @@ signals:
     void frameUpdated();
     void runStarted();
     void leveledUp(int newLevel);
+    void novaFired(qreal x, qreal y, qreal radius);
 
 private:
     void advancePlaying(qreal deltaSeconds);
