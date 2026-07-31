@@ -34,6 +34,11 @@ public:
 
 private:
     SpawnSystem() = delete;
+
+    static int enemyCount(const World& world);
+    static const Balance::EnemyDefinition& pickDefinition(World& world);
+    static void spawnEnemy(World& world);
+    static float randomRange(World& world, float min, float max);
 };
 
 class ProgressionSystem final {

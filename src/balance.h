@@ -39,23 +39,19 @@ struct EnemyDefinition {
     float xpReward;
     float attackInterval;
     float attackAnimDuration;
+    float weight; // relative chance of being picked for a spawn
 };
 
-inline constexpr EnemyDefinition bandit {
-    EntityKind::Bandit,
-    30.0f,
-    55.0f,
-    10.0f,
-    13.0f,
-    3.0f,
-    0.9f,
-    12.0f / 15.0f,
+inline constexpr EnemyDefinition enemyRoster[] = {
+    // kind                hp     speed  damage radius xp    interval animation    weight
+    { EntityKind::Bandit,  30.0f, 55.0f, 10.0f, 13.0f, 3.0f, 0.9f,    12.0f / 15.0f, 40.0f },
 };
 
 inline constexpr float enemyContactPadding = 2.0f;
-inline constexpr float enemyRespawnDelay = 1.25f;
 // Past the corner of the 480x320 scene, so enemies never appear on camera.
 inline constexpr float enemySpawnDistance = 340.0f;
+inline constexpr float spawnInterval = 2.2f;
+inline constexpr int maxEnemies = 60;
 
 inline constexpr float xpBase = 10.0f;
 inline constexpr float xpPerLevel = 8.0f;

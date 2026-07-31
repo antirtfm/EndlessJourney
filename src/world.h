@@ -4,6 +4,7 @@
 #include "herostats.h"
 
 #include <optional>
+#include <random>
 #include <vector>
 
 class CombatSystem;
@@ -71,7 +72,6 @@ private:
     friend class SpawnSystem;
 
     Entity& hero() { return m_entities.front(); }
-    void spawnBanditAt(float x, float y);
     void stepHeroResources(float deltaSeconds);
 
     std::vector<Entity> m_entities;
@@ -89,7 +89,9 @@ private:
     bool m_sprintExhausted = false;
 
     float m_heroAttackCooldown = 0.0f;
-    float m_enemyRespawnTime = 0.0f;
-    int m_nextSpawnOctant = 1;
+    float m_spawnTimer = 0.0f;
     int m_nextEntityId = 1;
+
+    // Not reseeded per run, so restarting does not replay the same spawns.
+    std::mt19937 m_rng;
 };

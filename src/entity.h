@@ -29,11 +29,12 @@ struct Entity {
     float attackInterval = 1.0f;
     float attackCooldown = 0.0f;
     float attackAnimTime = 0.0f;
+    float attackAnimDuration = 0.0f;
     int octant = 2;
     AnimState anim = AnimState::Idle;
 };
 
 constexpr bool isEnemy(const Entity& entity) noexcept
 {
-    return entity.kind == EntityKind::Bandit;
+    return entity.kind != EntityKind::Hero;
 }

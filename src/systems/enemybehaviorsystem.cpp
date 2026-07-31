@@ -47,7 +47,7 @@ void EnemyBehaviorSystem::step(World& world, float deltaSeconds)
         if (enemy.attackCooldown <= 0.0f) {
             world.m_hp -= enemy.damage;
             enemy.attackCooldown = enemy.attackInterval;
-            enemy.attackAnimTime = Balance::bandit.attackAnimDuration;
+            enemy.attackAnimTime = enemy.attackAnimDuration;
             enemy.anim = AnimState::Attack;
         } else {
             enemy.anim = AnimState::Idle;

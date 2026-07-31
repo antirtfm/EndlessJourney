@@ -25,8 +25,7 @@ void World::reset()
 
     m_input = {};
     m_heroAttackCooldown = 0.0f;
-    m_enemyRespawnTime = 0.0f;
-    m_nextSpawnOctant = 1;
+    m_spawnTimer = Balance::spawnInterval;
     m_nextEntityId = 1;
 
     m_entities.clear();
@@ -38,8 +37,6 @@ void World::reset()
     heroEntity.hp = heroEntity.maxHp = m_stats.maxHp;
     heroEntity.octant = 2;
     m_entities.push_back(heroEntity);
-
-    spawnBanditAt(Balance::enemySpawnDistance, 0.0f);
 }
 
 World::StepEvents World::step(float deltaSeconds)
@@ -93,22 +90,3 @@ void World::stepHeroResources(float deltaSeconds)
     m_mana = std::min(m_stats.maxMana, m_mana + m_stats.manaRegen * deltaSeconds);
 }
 
-void World::spawnBanditAt(float x, float y)
-{
-    const Balance::EnemyDefinition& definition = Balance::bandit;
-
-    Entity bandit;
-    bandit.id = m_nextEntityId++;
-    bandit.kind = definition.kind;
-    bandit.x = x;
-    bandit.y = y;
-    bandit.radius = definition.radius;
-    bandit.hp = bandit.maxHp = definition.hp;
-    bandit.speed = definition.speed;
-    bandit.damage = definition.damage;
-    bandit.xpReward = definition.xpReward;
-    bandit.attackInterval = definition.attackInterval;
-    bandit.octant = 4;
-    bandit.anim = AnimState::Walk;
-    m_entities.push_back(bandit);
-}

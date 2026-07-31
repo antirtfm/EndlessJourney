@@ -83,7 +83,6 @@ void CombatSystem::resolveDeaths(World& world, World::StepEvents& events)
         world.m_xp += entity.xpReward;
         ++world.m_kills;
         ++events.enemiesDied;
-        world.m_enemyRespawnTime = Balance::enemyRespawnDelay;
         world.m_entities.erase(world.m_entities.begin()
                                + static_cast<std::ptrdiff_t>(index));
     }
