@@ -1,4 +1,5 @@
 import QtQuick
+import EndlessJourney.Backend 1.0
 
 import "../util"
 
@@ -6,18 +7,8 @@ import "../util"
 Item {
     id: root
 
+    required property GameEngine engine
     required property real touchTargetSize
-    property real hp: 100
-    property real maxHp: 100
-    property real mana: 0
-    property real maxMana: 50
-    property real stamina: 100
-    property real maxStamina: 100
-    property real xp: 0
-    property real xpToNext: 10
-    property int level: 1
-    property int kills: 0
-    property real elapsed: 0
 
     signal exitRequested()
 
@@ -29,22 +20,22 @@ Item {
 
         HudBar {
             accessibleName: qsTr("Health")
-            value: root.hp
-            maxValue: root.maxHp
+            value: root.engine.hp
+            maxValue: root.engine.maxHp
             barColor: "#e63946"
         }
 
         HudBar {
             accessibleName: qsTr("Mana")
-            value: root.mana
-            maxValue: root.maxMana
+            value: root.engine.mana
+            maxValue: root.engine.maxMana
             barColor: "#4cc9f0"
         }
 
         HudBar {
             accessibleName: qsTr("Stamina")
-            value: root.stamina
-            maxValue: root.maxStamina
+            value: root.engine.stamina
+            maxValue: root.engine.maxStamina
             barColor: "#90be6d"
         }
 
@@ -56,13 +47,13 @@ Item {
                 width: 104
                 height: 6
                 anchors.verticalCenter: parent.verticalCenter
-                value: root.xp
-                maxValue: root.xpToNext
+                value: root.engine.xp
+                maxValue: root.engine.xpToNext
                 barColor: "#f9c74f"
             }
 
             Text {
-                text: qsTr("Lv %1").arg(root.level)
+                text: qsTr("Lv %1").arg(root.engine.level)
                 color: "#e8e8f0"
                 font.pixelSize: 11
             }
@@ -77,7 +68,7 @@ Item {
 
         Text {
             anchors.right: parent.right
-            text: timeFormatter.duration(root.elapsed)
+            text: timeFormatter.duration(root.engine.elapsed)
             color: "#e8e8f0"
             font.pixelSize: 18
             font.bold: true
@@ -85,7 +76,7 @@ Item {
 
         Text {
             anchors.right: parent.right
-            text: qsTr("Kills: %1").arg(root.kills)
+            text: qsTr("Kills: %1").arg(root.engine.kills)
             color: "#8d99ae"
             font.pixelSize: 12
         }

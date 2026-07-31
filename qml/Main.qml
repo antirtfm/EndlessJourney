@@ -1,5 +1,6 @@
 import Felgo
 import QtQuick
+import EndlessJourney.Backend 1.0
 
 GameWindow {
     id: gameWindow
@@ -13,7 +14,11 @@ GameWindow {
     // free license keys are available at https://felgo.com/licenseKey
     licenseKey: ""
 
-    activeScene: menuScene
+    activeScene: gameEngine.state === GameState.Menu ? menuScene : gameplayScene
+
+    GameEngine {
+        id: gameEngine
+    }
 
     Scene {
         id: menuScene
@@ -49,7 +54,7 @@ GameWindow {
                 focus: true
                 onEntrySelected: action => {
                     if (action === "newGame")
-                        gameWindow.activeScene = gameplayScene
+                        gameEngine.newGame()
                     else if (action === "quit")
                         Qt.quit()
                 }
@@ -60,7 +65,7 @@ GameWindow {
     GameScene {
         id: gameplayScene
 
+        engine: gameEngine
         visible: gameWindow.activeScene === gameplayScene
-        onExitRequested: gameWindow.activeScene = menuScene
     }
 }

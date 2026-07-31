@@ -6,6 +6,11 @@
 #endif
 
 #include <QQmlApplicationEngine>
+#include <QtQml/qqml.h>
+
+#include "src/entitymodel.h"
+#include "src/gameengine.h"
+#include "src/gamestatemachine.h"
 
 int main(int argc, char *argv[])
 {
@@ -18,6 +23,19 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
     felgo.initialize(&engine);
+
+    // Felgo initialization prepares the QML type registry, so custom backend
+    // types must be registered afterwards and before Hot Reload loads QML.
+    constexpr auto backendUri = "EndlessJourney.Backend";
+    qmlRegisterAnonymousType<EntityModel>(backendUri, 1);
+    qmlRegisterType<GameEngine>(backendUri, 1, 0, "GameEngine");
+    qmlRegisterUncreatableMetaObject(
+        GameState::staticMetaObject,
+        backendUri,
+        1,
+        0,
+        "GameState",
+        QStringLiteral("GameState only provides enum values"));
 
     // Set an optional license key from project file
     // This does not work if using Felgo Developer App, only for Felgo Cloud Builds and local builds

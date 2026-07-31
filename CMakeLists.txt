@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.16)
 project(EndlessJourney VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_AUTOMOC ON)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Felgo REQUIRED)
@@ -33,14 +34,35 @@ set(QmlFiles
     qml/components/GameActionButton.qml
     qml/config/Visuals.js
     qml/game/DirectionalSprite.qml
-    qml/game/EnemyActor.qml
+    qml/game/EntityView.qml
     qml/game/GroundLayer.qml
     qml/game/LevelUpFx.qml
+    qml/game/WorldLayer.qml
     qml/hud/GameHud.qml
     qml/hud/GameOverDialog.qml
     qml/hud/HudBar.qml
     qml/input/InputController.qml
     qml/util/TimeFormatter.qml
+)
+
+set(Sources
+    src/balance.h
+    src/entity.h
+    src/entitymodel.cpp
+    src/entitymodel.h
+    src/gameengine.cpp
+    src/gameengine.h
+    src/gamestatemachine.cpp
+    src/gamestatemachine.h
+    src/systems/combatsystem.cpp
+    src/systems/enemybehaviorsystem.cpp
+    src/systems/movementsystem.cpp
+    src/systems/progressionsystem.cpp
+    src/systems/simulationmath.h
+    src/systems/spawnsystem.cpp
+    src/systems/worldsystems.h
+    src/world.cpp
+    src/world.h
 )
 
 file(GLOB_RECURSE AssetFiles CONFIGURE_DEPENDS
@@ -51,10 +73,13 @@ file(GLOB_RECURSE AssetFiles CONFIGURE_DEPENDS
 # Executable should have same name as project
 qt_add_executable(appEndlessJourney
     main.cpp
+    ${Sources}
 )
 
 felgo_configure_executable(appEndlessJourney)
 felgohotreload_configure_executable(appEndlessJourney)
+
+target_include_directories(appEndlessJourney PRIVATE src)
 
 # Deploy resources to build folder/package directly
 # comment for publishing

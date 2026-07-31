@@ -1,22 +1,26 @@
 import QtQuick
+import EndlessJourney.Backend 1.0
 
 Item {
     id: root
 
-    required property real targetX
-    required property real targetY
+    required property GameEngine engine
 
-    x: root.targetX
-    y: root.targetY
+    x: root.engine.heroX
+    y: root.engine.heroY
     z: 9000
     visible: fxAnimation.running
 
-    function play(): void {
-        fxAnimation.restart()
-    }
+    Connections {
+        target: root.engine
 
-    function reset(): void {
-        fxAnimation.stop()
+        function onLeveledUp(newLevel: int): void {
+            fxAnimation.restart()
+        }
+
+        function onRunStarted(): void {
+            fxAnimation.stop()
+        }
     }
 
     Item {

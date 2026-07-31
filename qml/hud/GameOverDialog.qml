@@ -1,4 +1,5 @@
 import QtQuick
+import EndlessJourney.Backend 1.0
 
 import "../components"
 import "../util"
@@ -6,23 +7,17 @@ import "../util"
 FocusScope {
     id: root
 
-    required property bool opened
-    required property int kills
-    required property int level
-    required property real elapsed
+    required property GameEngine engine
     required property real touchTargetSize
 
-    signal restartRequested()
-    signal exitRequested()
-
-    visible: root.opened
-    enabled: root.opened
+    visible: root.engine.state === GameState.GameOver
+    enabled: root.visible
     onVisibleChanged: {
         if (root.visible)
             restartButton.forceActiveFocus()
     }
 
-    Keys.onEscapePressed: root.exitRequested()
+    Keys.onEscapePressed: root.engine.quitToMenu()
 
     Rectangle {
         anchors.fill: parent
@@ -48,9 +43,9 @@ FocusScope {
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             text: qsTr("Survived %1 | Level %2 | Kills: %3")
-                    .arg(timeFormatter.duration(root.elapsed))
-                    .arg(root.level)
-                    .arg(root.kills)
+                    .arg(timeFormatter.duration(root.engine.elapsed))
+                    .arg(root.engine.level)
+                    .arg(root.engine.kills)
             color: "#e8e8f0"
             font.pixelSize: 14
         }
@@ -66,7 +61,7 @@ FocusScope {
                 height: root.touchTargetSize
                 text: qsTr("Restart")
                 KeyNavigation.right: menuButton
-                onClicked: root.restartRequested()
+                onClicked: root.engine.newGame()
             }
 
             GameActionButton {
@@ -76,7 +71,7 @@ FocusScope {
                 height: root.touchTargetSize
                 text: qsTr("Menu")
                 KeyNavigation.left: restartButton
-                onClicked: root.exitRequested()
+                onClicked: root.engine.quitToMenu()
             }
         }
     }
