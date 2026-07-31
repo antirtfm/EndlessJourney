@@ -43,8 +43,10 @@ struct EnemyDefinition {
 };
 
 inline constexpr EnemyDefinition enemyRoster[] = {
-    // kind                hp     speed  damage radius xp    interval animation    weight
-    { EntityKind::Bandit,  30.0f, 55.0f, 10.0f, 13.0f, 3.0f, 0.9f,    12.0f / 15.0f, 40.0f },
+    // kind                hp     speed   damage radius xp    interval animation      weight
+    { EntityKind::Bandit,  30.0f, 55.0f,  10.0f, 13.0f, 3.0f, 0.9f,    12.0f / 15.0f, 40.0f },
+    { EntityKind::Goblin,  10.0f, 90.0f,  4.0f,  9.0f,  2.0f, 0.5f,    12.0f / 15.0f, 24.0f },
+    { EntityKind::Wolf,    14.0f, 105.0f, 5.0f,  10.0f, 2.0f, 0.55f,   12.0f / 15.0f, 25.0f },
 };
 
 inline constexpr float enemyContactPadding = 2.0f;

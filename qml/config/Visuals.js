@@ -59,6 +59,50 @@ var configs = {
                 fps: 15
             }
         }
+    },
+    goblin: {
+        frameSize: 256,
+        renderSize: 58,
+        directionMap: directionMap,
+        animations: {
+            idle: {
+                pattern: "enemies/goblin/Idle/Goblin_Idle_dir{dir}.png",
+                frameCount: 8,
+                fps: 7
+            },
+            walk: {
+                pattern: "enemies/goblin/Walk/Goblin_Walk_dir{dir}.png",
+                frameCount: 12,
+                fps: 14
+            },
+            attack: {
+                pattern: "enemies/goblin/Attack/Goblin_Attack_dir{dir}.png",
+                frameCount: 12,
+                fps: 15
+            }
+        }
+    },
+    wolf: {
+        frameSize: 256,
+        renderSize: 55,
+        directionMap: directionMap,
+        animations: {
+            idle: {
+                pattern: "enemies/wolf/Idle/Wolf_Idle_dir{dir}.png",
+                frameCount: 8,
+                fps: 6
+            },
+            walk: {
+                pattern: "enemies/wolf/Walk/Wolf_Walk_dir{dir}.png",
+                frameCount: 16,
+                fps: 14
+            },
+            attack: {
+                pattern: "enemies/wolf/Attack/Wolf_Attack_dir{dir}.png",
+                frameCount: 12,
+                fps: 15
+            }
+        }
     }
 };
 

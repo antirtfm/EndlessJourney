@@ -5,6 +5,8 @@
 enum class EntityKind : std::uint8_t {
     Hero,
     Bandit,
+    Goblin,
+    Wolf,
 };
 
 enum class AnimState : std::uint8_t {
