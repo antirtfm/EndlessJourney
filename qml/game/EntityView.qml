@@ -1,4 +1,5 @@
-import QtQuick
+﻿import QtQuick
+import QtQuick.Effects
 
 Item {
     id: root
@@ -11,11 +12,19 @@ Item {
     required property real hpRatio
     required property bool running
 
+    readonly property bool flashesOnHit: root.kind !== "hero"
+
     x: root.worldX - width / 2
     y: root.worldY - height / 2
     z: root.worldY
     implicitWidth: sprite.implicitWidth
     implicitHeight: sprite.implicitHeight
+
+    onHpRatioChanged: {
+        if (root.flashesOnHit && root.hpRatio < internal.previousHpRatio)
+            hitFlash.restart()
+        internal.previousHpRatio = root.hpRatio
+    }
 
     DirectionalSprite {
         id: sprite
@@ -25,6 +34,26 @@ Item {
         octant: root.octant
         animationName: root.animationName
         running: root.running
+    }
+
+    MultiEffect {
+        id: flashOverlay
+
+        anchors.fill: sprite
+        source: sprite
+        brightness: 1
+        opacity: 0
+        visible: flashOverlay.opacity > 0
+    }
+
+    NumberAnimation {
+        id: hitFlash
+
+        target: flashOverlay
+        property: "opacity"
+        from: 0.9
+        to: 0
+        duration: 160
     }
 
     Rectangle {
@@ -42,5 +71,11 @@ Item {
             radius: parent.radius
             color: "#e63946"
         }
+    }
+
+    QtObject {
+        id: internal
+
+        property real previousHpRatio: 1
     }
 }

@@ -28,7 +28,6 @@ inline constexpr float novaManaCost = 30.0f;
 inline constexpr float novaDamage = 45.0f;
 inline constexpr float novaRadius = 95.0f;
 
-// The run opens with exactly one nova in the tank.
 inline constexpr float heroStartMana = novaManaCost;
 
 struct EnemyDefinition {
@@ -55,7 +54,8 @@ inline constexpr EnemyDefinition bandit {
 
 inline constexpr float enemyContactPadding = 2.0f;
 inline constexpr float enemyRespawnDelay = 1.25f;
-inline constexpr float enemySpawnDistance = 180.0f;
+// Past the corner of the 480x320 scene, so enemies never appear on camera.
+inline constexpr float enemySpawnDistance = 340.0f;
 
 inline constexpr float xpBase = 10.0f;
 inline constexpr float xpPerLevel = 8.0f;
