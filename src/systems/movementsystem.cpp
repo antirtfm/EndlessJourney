@@ -28,8 +28,8 @@ void MovementSystem::step(World& world, float deltaSeconds)
 
     if (moving) {
         const float speed = sprinting
-            ? Balance::heroSprintSpeed
-            : Balance::heroMoveSpeed;
+            ? world.m_stats.sprintSpeed
+            : world.m_stats.moveSpeed;
         hero.x += moveX * speed * deltaSeconds;
         hero.y += moveY * speed * deltaSeconds;
 
@@ -47,7 +47,7 @@ void MovementSystem::step(World& world, float deltaSeconds)
             world.m_sprintExhausted = true;
     } else {
         world.m_stamina = std::min(
-            world.m_maxStamina,
+            world.m_stats.maxStamina,
             world.m_stamina + Balance::staminaRegen * deltaSeconds);
         if (world.m_stamina >= Balance::staminaRecoveryThreshold)
             world.m_sprintExhausted = false;

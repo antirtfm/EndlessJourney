@@ -1,6 +1,7 @@
 #pragma once
 
 #include "entity.h"
+#include "herostats.h"
 
 #include <optional>
 #include <vector>
@@ -8,6 +9,7 @@
 class CombatSystem;
 class EnemyBehaviorSystem;
 class MovementSystem;
+class Powerups;
 class ProgressionSystem;
 class SpawnSystem;
 
@@ -46,13 +48,14 @@ public:
 
     const std::vector<Entity>& entities() const noexcept { return m_entities; }
     const Entity& hero() const { return m_entities.front(); }
+    const HeroStats& stats() const noexcept { return m_stats; }
 
     float hp() const noexcept { return m_hp; }
-    float maxHp() const noexcept { return m_maxHp; }
+    float maxHp() const noexcept { return m_stats.maxHp; }
     float mana() const noexcept { return m_mana; }
-    float maxMana() const noexcept { return m_maxMana; }
+    float maxMana() const noexcept { return m_stats.maxMana; }
     float stamina() const noexcept { return m_stamina; }
-    float maxStamina() const noexcept { return m_maxStamina; }
+    float maxStamina() const noexcept { return m_stats.maxStamina; }
     float xp() const noexcept { return m_xp; }
     int level() const noexcept { return m_level; }
     int kills() const noexcept { return m_kills; }
@@ -63,21 +66,21 @@ private:
     friend class CombatSystem;
     friend class EnemyBehaviorSystem;
     friend class MovementSystem;
+    friend class Powerups;
     friend class ProgressionSystem;
     friend class SpawnSystem;
 
     Entity& hero() { return m_entities.front(); }
     void spawnBanditAt(float x, float y);
+    void stepHeroResources(float deltaSeconds);
 
     std::vector<Entity> m_entities;
     Input m_input;
+    HeroStats m_stats;
 
     float m_hp = 0.0f;
-    float m_maxHp = 0.0f;
     float m_mana = 0.0f;
-    float m_maxMana = 0.0f;
     float m_stamina = 0.0f;
-    float m_maxStamina = 0.0f;
     float m_xp = 0.0f;
     int m_level = 1;
     int m_kills = 0;

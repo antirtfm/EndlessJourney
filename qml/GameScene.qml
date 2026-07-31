@@ -80,9 +80,15 @@ Scene {
         onExitRequested: gameScene.engine.quitToMenu()
     }
 
-    GameOverDialog {
+    PowerupDialog {
         anchors.fill: gameScene.gameWindowAnchorItem
         z: 10
+        engine: gameScene.engine
+    }
+
+    GameOverDialog {
+        anchors.fill: gameScene.gameWindowAnchorItem
+        z: 11
         engine: gameScene.engine
         touchTargetSize: gameScene.dp(48)
     }

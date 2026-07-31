@@ -12,12 +12,10 @@ World::World()
 
 void World::reset()
 {
-    m_maxHp = Balance::heroMaxHp;
-    m_hp = m_maxHp;
-    m_maxMana = Balance::heroMaxMana;
+    m_stats = {};
+    m_hp = m_stats.maxHp;
     m_mana = Balance::heroStartMana;
-    m_maxStamina = Balance::heroMaxStamina;
-    m_stamina = m_maxStamina;
+    m_stamina = m_stats.maxStamina;
     m_xp = 0.0f;
     m_level = 1;
     m_kills = 0;
@@ -37,7 +35,7 @@ void World::reset()
     heroEntity.id = m_nextEntityId++;
     heroEntity.kind = EntityKind::Hero;
     heroEntity.radius = Balance::heroRadius;
-    heroEntity.hp = heroEntity.maxHp = m_maxHp;
+    heroEntity.hp = heroEntity.maxHp = m_stats.maxHp;
     heroEntity.octant = 2;
     m_entities.push_back(heroEntity);
 
@@ -51,9 +49,10 @@ World::StepEvents World::step(float deltaSeconds)
         return events;
 
     m_elapsed += deltaSeconds;
+    stepHeroResources(deltaSeconds);
     MovementSystem::step(*this, deltaSeconds);
     CombatSystem::stepHeroAttack(*this, deltaSeconds);
-    CombatSystem::stepNova(*this, deltaSeconds, events);
+    CombatSystem::stepNova(*this, events);
     EnemyBehaviorSystem::step(*this, deltaSeconds);
     SpawnSystem::step(*this, deltaSeconds);
     CombatSystem::resolveDeaths(*this, events);
@@ -86,6 +85,12 @@ float World::xpToNext() const noexcept
 {
     return Balance::xpBase
         + Balance::xpPerLevel * static_cast<float>(m_level - 1);
+}
+
+void World::stepHeroResources(float deltaSeconds)
+{
+    m_hp = std::min(m_stats.maxHp, m_hp + m_stats.hpRegen * deltaSeconds);
+    m_mana = std::min(m_stats.maxMana, m_mana + m_stats.manaRegen * deltaSeconds);
 }
 
 void World::spawnBanditAt(float x, float y)

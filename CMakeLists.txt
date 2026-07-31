@@ -42,6 +42,7 @@ set(QmlFiles
     qml/hud/GameHud.qml
     qml/hud/GameOverDialog.qml
     qml/hud/HudBar.qml
+    qml/hud/PowerupDialog.qml
     qml/input/InputController.qml
     qml/util/TimeFormatter.qml
 )
@@ -55,6 +56,9 @@ set(Sources
     src/gameengine.h
     src/gamestatemachine.cpp
     src/gamestatemachine.h
+    src/herostats.h
+    src/powerups.cpp
+    src/powerups.h
     src/systems/combatsystem.cpp
     src/systems/enemybehaviorsystem.cpp
     src/systems/movementsystem.cpp

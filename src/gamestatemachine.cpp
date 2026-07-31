@@ -17,9 +17,12 @@ struct Transition {
 constexpr std::array transitions {
     Transition { State::Menu, Event::StartGame, State::Playing },
     Transition { State::GameOver, Event::StartGame, State::Playing },
+    Transition { State::Playing, Event::LevelReached, State::LevelUp },
+    Transition { State::LevelUp, Event::PowerupSelected, State::Playing },
     Transition { State::Playing, Event::HeroDied, State::Dying },
     Transition { State::Dying, Event::DeathAnimationFinished, State::GameOver },
     Transition { State::Playing, Event::ReturnToMenu, State::Menu },
+    Transition { State::LevelUp, Event::ReturnToMenu, State::Menu },
     Transition { State::Dying, Event::ReturnToMenu, State::Menu },
     Transition { State::GameOver, Event::ReturnToMenu, State::Menu },
 };

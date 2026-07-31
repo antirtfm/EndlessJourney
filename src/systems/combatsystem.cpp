@@ -16,7 +16,7 @@ void CombatSystem::stepHeroAttack(World& world, float deltaSeconds)
 
     Entity& hero = world.hero();
     Entity* target = nullptr;
-    float closestDistance = Balance::heroAttackRange;
+    float closestDistance = world.m_stats.attackRange;
 
     for (std::size_t index = 1; index < world.m_entities.size(); ++index) {
         Entity& candidate = world.m_entities[index];
@@ -33,21 +33,16 @@ void CombatSystem::stepHeroAttack(World& world, float deltaSeconds)
     if (!target)
         return;
 
-    target->hp -= Balance::heroDamage;
+    target->hp -= world.m_stats.damage;
     hero.attackAnimTime = Balance::heroAttackAnimDuration;
     hero.anim = AnimState::Attack;
     hero.octant = SimulationMath::octantFromDirection(
         target->x - hero.x, target->y - hero.y, hero.octant);
-    world.m_heroAttackCooldown = 1.0f / Balance::heroAttackRate;
+    world.m_heroAttackCooldown = 1.0f / world.m_stats.attackRate;
 }
 
-void CombatSystem::stepNova(World& world, float deltaSeconds,
-                            World::StepEvents& events)
+void CombatSystem::stepNova(World& world, World::StepEvents& events)
 {
-    world.m_mana = std::min(
-        world.m_maxMana,
-        world.m_mana + Balance::heroManaRegen * deltaSeconds);
-
     if (!std::exchange(world.m_input.castNova, false))
         return;
     if (world.m_mana < Balance::novaManaCost)
@@ -56,19 +51,16 @@ void CombatSystem::stepNova(World& world, float deltaSeconds,
     world.m_mana -= Balance::novaManaCost;
 
     const Entity& hero = world.hero();
+    const float radius = world.m_stats.novaRadius;
     for (std::size_t index = 1; index < world.m_entities.size(); ++index) {
         Entity& enemy = world.m_entities[index];
         if (!isEnemy(enemy) || enemy.hp <= 0.0f)
             continue;
-        if (SimulationMath::distance(hero, enemy) <= Balance::novaRadius)
-            enemy.hp -= Balance::novaDamage;
+        if (SimulationMath::distance(hero, enemy) <= radius)
+            enemy.hp -= world.m_stats.novaDamage;
     }
 
-    events.novaBlast = World::NovaBlast {
-        hero.x,
-        hero.y,
-        Balance::novaRadius,
-    };
+    events.novaBlast = World::NovaBlast { hero.x, hero.y, radius };
 }
 
 void CombatSystem::resolveDeaths(World& world, World::StepEvents& events)

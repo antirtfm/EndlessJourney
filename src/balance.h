@@ -8,6 +8,7 @@ inline constexpr float fixedStep = 1.0f / 60.0f;
 inline constexpr float maxFrameTime = 0.1f;
 
 inline constexpr float heroMaxHp = 100.0f;
+inline constexpr float heroHpRegen = 0.0f;
 inline constexpr float heroMoveSpeed = 120.0f;
 inline constexpr float heroSprintSpeed = 185.0f;
 inline constexpr float heroRadius = 12.0f;

@@ -13,8 +13,7 @@ private:
 class CombatSystem final {
 public:
     static void stepHeroAttack(World& world, float deltaSeconds);
-    static void stepNova(World& world, float deltaSeconds,
-                         World::StepEvents& events);
+    static void stepNova(World& world, World::StepEvents& events);
     static void resolveDeaths(World& world, World::StepEvents& events);
 
 private:

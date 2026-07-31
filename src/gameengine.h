@@ -2,10 +2,14 @@
 
 #include "entitymodel.h"
 #include "gamestatemachine.h"
+#include "powerups.h"
 #include "world.h"
 
 #include <QObject>
+#include <QVariantList>
 #include <QtQml/qqmlregistration.h>
+
+#include <random>
 
 class GameEngine : public QObject {
     Q_OBJECT
@@ -13,6 +17,8 @@ class GameEngine : public QObject {
 
     Q_PROPERTY(GameState::Value state READ state NOTIFY stateChanged)
     Q_PROPERTY(EntityModel* entityModel READ entityModel CONSTANT)
+    Q_PROPERTY(QVariantList offeredPowerups READ offeredPowerups NOTIFY offeredPowerupsChanged)
+    Q_PROPERTY(int powerupChoiceLevel READ powerupChoiceLevel NOTIFY offeredPowerupsChanged)
     Q_PROPERTY(qreal heroX READ heroX NOTIFY frameUpdated)
     Q_PROPERTY(qreal heroY READ heroY NOTIFY frameUpdated)
     Q_PROPERTY(qreal hp READ hp NOTIFY frameUpdated)
@@ -32,6 +38,8 @@ public:
 
     GameState::Value state() const noexcept { return m_stateMachine.state(); }
     EntityModel* entityModel() noexcept { return &m_entityModel; }
+    QVariantList offeredPowerups() const { return Powerups::toVariantList(m_offeredPowerups); }
+    int powerupChoiceLevel() const noexcept { return m_powerupChoiceLevel; }
 
     qreal heroX() const noexcept { return m_world.hero().x; }
     qreal heroY() const noexcept { return m_world.hero().y; }
@@ -52,6 +60,7 @@ public:
     Q_INVOKABLE void setMoveInput(qreal x, qreal y);
     Q_INVOKABLE void setSprint(bool sprinting);
     Q_INVOKABLE void castNova();
+    Q_INVOKABLE void selectPowerup(int id);
     Q_INVOKABLE void quitToMenu();
 
 signals:
@@ -60,15 +69,23 @@ signals:
     void runStarted();
     void leveledUp(int newLevel);
     void novaFired(qreal x, qreal y, qreal radius);
+    void offeredPowerupsChanged();
 
 private:
     void advancePlaying(qreal deltaSeconds);
     void advanceDying(qreal deltaSeconds);
     void beginHeroDeath();
+    void beginLevelUp(int levelsGained);
+    void offerNextPowerupChoice();
+    bool clearLevelUpState();
 
     World m_world;
     EntityModel m_entityModel;
     GameStateMachine m_stateMachine;
+    Powerups::OfferList m_offeredPowerups;
+    std::mt19937 m_rng;
     qreal m_accumulator = 0.0;
     qreal m_deathAnimationRemaining = 0.0;
+    int m_pendingPowerupChoices = 0;
+    int m_powerupChoiceLevel = 0;
 };

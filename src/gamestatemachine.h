@@ -11,6 +11,7 @@ QML_NAMED_ELEMENT(GameState)
 enum class Value {
     Menu,
     Playing,
+    LevelUp,
     Dying,
     GameOver,
 };
@@ -24,6 +25,8 @@ public:
 
     enum class Event {
         StartGame,
+        LevelReached,
+        PowerupSelected,
         HeroDied,
         DeathAnimationFinished,
         ReturnToMenu,

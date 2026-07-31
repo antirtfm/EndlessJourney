@@ -15,6 +15,7 @@ using Event = GameStateMachine::Event;
 GameEngine::GameEngine(QObject* parent)
     : QObject(parent)
     , m_entityModel(&m_world, this)
+    , m_rng(std::random_device {}())
 {
     m_entityModel.resetRows();
 }
@@ -28,8 +29,10 @@ void GameEngine::newGame()
     m_accumulator = 0.0;
     m_deathAnimationRemaining = 0.0;
     m_entityModel.resetRows();
+    clearLevelUpState();
 
     emit stateChanged();
+    emit offeredPowerupsChanged();
     emit runStarted();
     emit frameUpdated();
 }
@@ -74,6 +77,37 @@ void GameEngine::castNova()
     m_world.requestNova();
 }
 
+void GameEngine::selectPowerup(int id)
+{
+    if (state() != State::LevelUp || m_pendingPowerupChoices <= 0)
+        return;
+
+    const std::optional<PowerupId> selected = Powerups::idFromInt(id);
+    if (!selected || !Powerups::contains(m_offeredPowerups, *selected))
+        return;
+    if (!Powerups::apply(*selected, m_world))
+        return;
+
+    // Several levels can land in the same step, so keep offering until the
+    // queue drains before handing control back.
+    if (--m_pendingPowerupChoices > 0) {
+        ++m_powerupChoiceLevel;
+        offerNextPowerupChoice();
+        emit offeredPowerupsChanged();
+        emit leveledUp(m_powerupChoiceLevel);
+        emit frameUpdated();
+        return;
+    }
+
+    if (!m_stateMachine.dispatch(Event::PowerupSelected))
+        return;
+
+    clearLevelUpState();
+    emit stateChanged();
+    emit offeredPowerupsChanged();
+    emit frameUpdated();
+}
+
 void GameEngine::quitToMenu()
 {
     if (!m_stateMachine.dispatch(Event::ReturnToMenu))
@@ -82,7 +116,11 @@ void GameEngine::quitToMenu()
     m_world.clearInput();
     m_accumulator = 0.0;
     m_deathAnimationRemaining = 0.0;
+    const bool hadLevelUpState = clearLevelUpState();
+
     emit stateChanged();
+    if (hadLevelUpState)
+        emit offeredPowerupsChanged();
 }
 
 void GameEngine::advancePlaying(qreal deltaSeconds)
@@ -97,10 +135,10 @@ void GameEngine::advancePlaying(qreal deltaSeconds)
             emit novaFired(events.novaBlast->x, events.novaBlast->y,
                            events.novaBlast->radius);
         }
-        if (events.levelsGained > 0)
-            emit leveledUp(m_world.level());
         if (events.heroDied)
             beginHeroDeath();
+        else if (events.levelsGained > 0)
+            beginLevelUp(events.levelsGained);
     }
 
     m_entityModel.sync();
@@ -126,4 +164,37 @@ void GameEngine::beginHeroDeath()
     m_world.clearInput();
     m_deathAnimationRemaining = Balance::heroDeathAnimDuration;
     emit stateChanged();
+}
+
+void GameEngine::beginLevelUp(int levelsGained)
+{
+    if (levelsGained <= 0 || !m_stateMachine.dispatch(Event::LevelReached))
+        return;
+
+    m_world.clearInput();
+    m_pendingPowerupChoices = levelsGained;
+    m_powerupChoiceLevel = m_world.level() - levelsGained + 1;
+    offerNextPowerupChoice();
+
+    emit stateChanged();
+    emit offeredPowerupsChanged();
+    emit leveledUp(m_powerupChoiceLevel);
+}
+
+void GameEngine::offerNextPowerupChoice()
+{
+    m_offeredPowerups = Powerups::offer(m_rng);
+}
+
+bool GameEngine::clearLevelUpState()
+{
+    if (m_offeredPowerups.empty() && m_pendingPowerupChoices == 0
+        && m_powerupChoiceLevel == 0) {
+        return false;
+    }
+
+    m_offeredPowerups.clear();
+    m_pendingPowerupChoices = 0;
+    m_powerupChoiceLevel = 0;
+    return true;
 }
