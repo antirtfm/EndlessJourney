@@ -59,5 +59,6 @@ inline constexpr float enemySpawnDistance = 180.0f;
 
 inline constexpr float xpBase = 10.0f;
 inline constexpr float xpPerLevel = 8.0f;
+inline constexpr int powerupRerolls = 2;
 
 } // namespace Balance

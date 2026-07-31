@@ -2,6 +2,8 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import EndlessJourney.Backend 1.0
 
+import "../components"
+
 FocusScope {
     id: root
 
@@ -26,6 +28,13 @@ FocusScope {
     Keys.onDigit1Pressed: internal.choose(0)
     Keys.onDigit2Pressed: internal.choose(1)
     Keys.onDigit3Pressed: internal.choose(2)
+    Keys.onPressed: event => {
+        if (event.key !== Qt.Key_R)
+            return
+
+        root.engine.rerollPowerups()
+        event.accepted = true
+    }
 
     Connections {
         target: root.engine
@@ -116,6 +125,16 @@ FocusScope {
                     }
                 }
             }
+        }
+
+        GameActionButton {
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: 160
+            height: 28
+            textSize: 11
+            enabled: root.engine.rerollsLeft > 0
+            text: qsTr("Reroll (R) — %1 left").arg(root.engine.rerollsLeft)
+            onClicked: root.engine.rerollPowerups()
         }
 
         Text {

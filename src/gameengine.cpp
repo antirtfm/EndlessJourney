@@ -108,6 +108,16 @@ void GameEngine::selectPowerup(int id)
     emit frameUpdated();
 }
 
+void GameEngine::rerollPowerups()
+{
+    if (state() != State::LevelUp || m_rerollsLeft <= 0)
+        return;
+
+    --m_rerollsLeft;
+    m_offeredPowerups = Powerups::offer(m_rng);
+    emit offeredPowerupsChanged();
+}
+
 void GameEngine::quitToMenu()
 {
     if (!m_stateMachine.dispatch(Event::ReturnToMenu))
@@ -184,17 +194,19 @@ void GameEngine::beginLevelUp(int levelsGained)
 void GameEngine::offerNextPowerupChoice()
 {
     m_offeredPowerups = Powerups::offer(m_rng);
+    m_rerollsLeft = Balance::powerupRerolls;
 }
 
 bool GameEngine::clearLevelUpState()
 {
     if (m_offeredPowerups.empty() && m_pendingPowerupChoices == 0
-        && m_powerupChoiceLevel == 0) {
+        && m_powerupChoiceLevel == 0 && m_rerollsLeft == 0) {
         return false;
     }
 
     m_offeredPowerups.clear();
     m_pendingPowerupChoices = 0;
     m_powerupChoiceLevel = 0;
+    m_rerollsLeft = 0;
     return true;
 }

@@ -19,6 +19,7 @@ class GameEngine : public QObject {
     Q_PROPERTY(EntityModel* entityModel READ entityModel CONSTANT)
     Q_PROPERTY(QVariantList offeredPowerups READ offeredPowerups NOTIFY offeredPowerupsChanged)
     Q_PROPERTY(int powerupChoiceLevel READ powerupChoiceLevel NOTIFY offeredPowerupsChanged)
+    Q_PROPERTY(int rerollsLeft READ rerollsLeft NOTIFY offeredPowerupsChanged)
     Q_PROPERTY(qreal heroX READ heroX NOTIFY frameUpdated)
     Q_PROPERTY(qreal heroY READ heroY NOTIFY frameUpdated)
     Q_PROPERTY(qreal hp READ hp NOTIFY frameUpdated)
@@ -40,6 +41,7 @@ public:
     EntityModel* entityModel() noexcept { return &m_entityModel; }
     QVariantList offeredPowerups() const { return Powerups::toVariantList(m_offeredPowerups); }
     int powerupChoiceLevel() const noexcept { return m_powerupChoiceLevel; }
+    int rerollsLeft() const noexcept { return m_rerollsLeft; }
 
     qreal heroX() const noexcept { return m_world.hero().x; }
     qreal heroY() const noexcept { return m_world.hero().y; }
@@ -61,6 +63,7 @@ public:
     Q_INVOKABLE void setSprint(bool sprinting);
     Q_INVOKABLE void castNova();
     Q_INVOKABLE void selectPowerup(int id);
+    Q_INVOKABLE void rerollPowerups();
     Q_INVOKABLE void quitToMenu();
 
 signals:
@@ -88,4 +91,5 @@ private:
     qreal m_deathAnimationRemaining = 0.0;
     int m_pendingPowerupChoices = 0;
     int m_powerupChoiceLevel = 0;
+    int m_rerollsLeft = 0;
 };
