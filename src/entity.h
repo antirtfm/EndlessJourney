@@ -7,7 +7,15 @@ enum class EntityKind : std::uint8_t {
     Bandit,
     Goblin,
     Wolf,
+    Slime,
     BanditBow,
+    Skeleton,
+    Orc,
+    DarkElf,
+    FlyingDemon,
+    DarkAngel,
+    Treant,
+    Dragon,
     Arrow,
 };
 

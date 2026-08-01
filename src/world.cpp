@@ -25,7 +25,7 @@ void World::reset()
 
     m_input = {};
     m_heroAttackCooldown = 0.0f;
-    m_spawnTimer = Balance::spawnInterval;
+    m_spawnTimer = Balance::spawnIntervalStart;
     m_nextEntityId = 1;
 
     m_entities.clear();
