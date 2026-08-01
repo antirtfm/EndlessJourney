@@ -28,7 +28,6 @@ set(PRODUCT_LICENSE_KEY "")
 # Keep source lists explicit so adding or removing a file always regenerates the
 # correct deployment, QML compilation and lint rules.
 set(QmlFiles
-    qml/GameScene.qml
     qml/GameTheme.qml
     qml/Main.qml
     qml/MainMenu.qml
@@ -47,6 +46,8 @@ set(QmlFiles
     qml/hud/PauseOverlay.qml
     qml/hud/PowerupDialog.qml
     qml/input/InputController.qml
+    qml/scenes/GameScene.qml
+    qml/scenes/MenuScene.qml
     qml/util/TimeFormatter.qml
 )
 

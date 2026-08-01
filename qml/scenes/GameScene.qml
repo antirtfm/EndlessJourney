@@ -2,9 +2,10 @@ import Felgo
 import QtQuick
 import EndlessJourney.Backend 1.0
 
-import "game"
-import "hud"
-import "input"
+import ".."
+import "../game"
+import "../hud"
+import "../input"
 
 Scene {
     id: gameScene

@@ -1,1 +1,2 @@
 singleton GameTheme 1.0 GameTheme.qml
+MainMenu 1.0 MainMenu.qml
