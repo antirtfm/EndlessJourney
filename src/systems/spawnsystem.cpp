@@ -1,4 +1,4 @@
-#include "worldsystems.h"
+﻿#include "worldsystems.h"
 
 #include "balance.h"
 #include "simulationmath.h"
@@ -61,6 +61,7 @@ void SpawnSystem::spawnEnemy(World& world)
     enemy.xpReward = definition.xpReward;
     enemy.attackInterval = definition.attackInterval;
     enemy.attackAnimDuration = definition.attackAnimDuration;
+    enemy.ranged = definition.ranged;
     enemy.octant = SimulationMath::octantFromDirection(
         hero.x - enemy.x, hero.y - enemy.y, 2);
     enemy.anim = AnimState::Walk;

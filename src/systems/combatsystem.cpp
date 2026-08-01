@@ -1,4 +1,4 @@
-#include "worldsystems.h"
+﻿#include "worldsystems.h"
 
 #include "balance.h"
 #include "simulationmath.h"
@@ -61,6 +61,40 @@ void CombatSystem::stepNova(World& world, World::StepEvents& events)
     }
 
     events.novaBlast = World::NovaBlast { hero.x, hero.y, radius };
+}
+
+void CombatSystem::stepProjectiles(World& world, float deltaSeconds)
+{
+    const Entity& hero = world.hero();
+    const float heroX = hero.x;
+    const float heroY = hero.y;
+    const float heroRadius = hero.radius;
+
+    for (std::size_t index = 1; index < world.m_entities.size();) {
+        Entity& projectile = world.m_entities[index];
+        if (!isProjectile(projectile)) {
+            ++index;
+            continue;
+        }
+
+        projectile.x += projectile.vx * deltaSeconds;
+        projectile.y += projectile.vy * deltaSeconds;
+        projectile.lifetime -= deltaSeconds;
+
+        const float reach = projectile.radius + heroRadius;
+        const bool hitHero = std::hypot(heroX - projectile.x,
+                                        heroY - projectile.y)
+            <= reach;
+        if (hitHero)
+            world.m_hp -= projectile.damage;
+
+        if (hitHero || projectile.lifetime <= 0.0f) {
+            world.m_entities.erase(world.m_entities.begin()
+                                   + static_cast<std::ptrdiff_t>(index));
+            continue;
+        }
+        ++index;
+    }
 }
 
 void CombatSystem::resolveDeaths(World& world, World::StepEvents& events)

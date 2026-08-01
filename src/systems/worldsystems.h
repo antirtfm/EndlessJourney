@@ -2,6 +2,8 @@
 
 #include "world.h"
 
+#include <vector>
+
 class MovementSystem final {
 public:
     static void step(World& world, float deltaSeconds);
@@ -14,6 +16,7 @@ class CombatSystem final {
 public:
     static void stepHeroAttack(World& world, float deltaSeconds);
     static void stepNova(World& world, World::StepEvents& events);
+    static void stepProjectiles(World& world, float deltaSeconds);
     static void resolveDeaths(World& world, World::StepEvents& events);
 
 private:
@@ -26,6 +29,10 @@ public:
 
 private:
     EnemyBehaviorSystem() = delete;
+
+    static void stepRangedEnemy(World& world, Entity& enemy, float deltaSeconds,
+                                float distanceToHero, float dx, float dy,
+                                std::vector<Entity>& firedArrows);
 };
 
 class SpawnSystem final {

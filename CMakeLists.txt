@@ -33,6 +33,7 @@ set(QmlFiles
     qml/MainMenu.qml
     qml/components/GameActionButton.qml
     qml/config/Visuals.js
+    qml/game/ArrowSprite.qml
     qml/game/DirectionalSprite.qml
     qml/game/EntityView.qml
     qml/game/GroundLayer.qml

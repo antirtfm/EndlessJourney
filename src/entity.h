@@ -7,6 +7,8 @@ enum class EntityKind : std::uint8_t {
     Bandit,
     Goblin,
     Wolf,
+    BanditBow,
+    Arrow,
 };
 
 enum class AnimState : std::uint8_t {
@@ -32,11 +34,21 @@ struct Entity {
     float attackCooldown = 0.0f;
     float attackAnimTime = 0.0f;
     float attackAnimDuration = 0.0f;
+    float vx = 0.0f; // projectiles fly on a fixed velocity
+    float vy = 0.0f;
+    float lifetime = 0.0f; // projectiles expire when this runs out
+    bool ranged = false;   // keeps its distance and shoots instead of closing
+    bool shotPending = false; // drawing a bow, releases when the draw finishes
     int octant = 2;
     AnimState anim = AnimState::Idle;
 };
 
+constexpr bool isProjectile(const Entity& entity) noexcept
+{
+    return entity.kind == EntityKind::Arrow;
+}
+
 constexpr bool isEnemy(const Entity& entity) noexcept
 {
-    return entity.kind != EntityKind::Hero;
+    return entity.kind != EntityKind::Hero && !isProjectile(entity);
 }

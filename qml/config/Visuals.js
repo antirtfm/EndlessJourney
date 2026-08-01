@@ -82,6 +82,28 @@ var configs = {
             }
         }
     },
+    banditBow: {
+        frameSize: 256,
+        renderSize: 67,
+        directionMap: directionMap,
+        animations: {
+            idle: {
+                pattern: "enemies/bandit_w_bow/Idle/BanditBow_Idle_dir{dir}.png",
+                frameCount: 8,
+                fps: 6
+            },
+            walk: {
+                pattern: "enemies/bandit_w_bow/Walk/BanditBow_Walk_dir{dir}.png",
+                frameCount: 12,
+                fps: 12
+            },
+            attack: {
+                pattern: "enemies/bandit_w_bow/Attack/BanditBow_Attack_dir{dir}.png",
+                frameCount: 12,
+                fps: 12
+            }
+        }
+    },
     wolf: {
         frameSize: 256,
         renderSize: 55,

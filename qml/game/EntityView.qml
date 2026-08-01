@@ -1,4 +1,5 @@
-﻿import QtQuick
+﻿pragma ComponentBehavior: Bound
+import QtQuick
 import QtQuick.Effects
 
 Item {
@@ -12,13 +13,14 @@ Item {
     required property real hpRatio
     required property bool running
 
-    readonly property bool flashesOnHit: root.kind !== "hero"
+    readonly property bool isProjectile: root.kind === "arrow"
+    readonly property bool flashesOnHit: root.kind !== "hero" && !root.isProjectile
 
     x: root.worldX - width / 2
     y: root.worldY - height / 2
     z: root.worldY
-    implicitWidth: sprite.implicitWidth
-    implicitHeight: sprite.implicitHeight
+    implicitWidth: visual.implicitWidth
+    implicitHeight: visual.implicitHeight
 
     onHpRatioChanged: {
         if (root.flashesOnHit && root.hpRatio < internal.previousHpRatio)
@@ -26,21 +28,36 @@ Item {
         internal.previousHpRatio = root.hpRatio
     }
 
-    DirectionalSprite {
-        id: sprite
+    Loader {
+        id: visual
 
-        anchors.fill: parent
-        entityKind: root.kind
-        octant: root.octant
-        animationName: root.animationName
-        running: root.running
+        sourceComponent: root.isProjectile ? arrowVisual : spriteVisual
+    }
+
+    Component {
+        id: spriteVisual
+
+        DirectionalSprite {
+            entityKind: root.kind
+            octant: root.octant
+            animationName: root.animationName
+            running: root.running
+        }
+    }
+
+    Component {
+        id: arrowVisual
+
+        ArrowSprite {
+            octant: root.octant
+        }
     }
 
     MultiEffect {
         id: flashOverlay
 
-        anchors.fill: sprite
-        source: sprite
+        anchors.fill: visual
+        source: visual
         brightness: 1
         opacity: 0
         visible: flashOverlay.opacity > 0
@@ -63,7 +80,7 @@ Item {
         height: 3
         radius: 1
         color: "#40000000"
-        visible: root.kind !== "hero" && root.hpRatio < 1
+        visible: root.flashesOnHit && root.hpRatio < 1
 
         Rectangle {
             width: parent.width * Math.max(0, Math.min(1, root.hpRatio))

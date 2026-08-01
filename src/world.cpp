@@ -51,6 +51,7 @@ World::StepEvents World::step(float deltaSeconds)
     CombatSystem::stepHeroAttack(*this, deltaSeconds);
     CombatSystem::stepNova(*this, events);
     EnemyBehaviorSystem::step(*this, deltaSeconds);
+    CombatSystem::stepProjectiles(*this, deltaSeconds);
     SpawnSystem::step(*this, deltaSeconds);
     CombatSystem::resolveDeaths(*this, events);
     ProgressionSystem::step(*this, events);

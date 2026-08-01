@@ -19,6 +19,10 @@ QString kindName(EntityKind kind)
         return QStringLiteral("goblin");
     case EntityKind::Wolf:
         return QStringLiteral("wolf");
+    case EntityKind::BanditBow:
+        return QStringLiteral("banditBow");
+    case EntityKind::Arrow:
+        return QStringLiteral("arrow");
     }
     return {};
 }
