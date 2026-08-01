@@ -24,7 +24,7 @@ Scene {
 
     Rectangle {
         anchors.fill: gameScene.fullWindowAnchorItem
-        color: "#0a0e1a"
+        color: GameTheme.background
     }
 
     Item {
@@ -59,7 +59,7 @@ Scene {
         anchors.bottom: parent.bottom
         anchors.margins: 8
         text: qsTr("WASD / arrows / hold mouse — move · Shift — sprint · Space / RMB — nova")
-        color: "#8d99ae"
+        color: GameTheme.textSecondary
         font.pixelSize: 9
     }
 

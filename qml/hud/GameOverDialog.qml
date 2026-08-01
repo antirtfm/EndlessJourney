@@ -1,6 +1,7 @@
 import QtQuick
 import EndlessJourney.Backend 1.0
 
+import ".."
 import "../components"
 import "../util"
 
@@ -21,7 +22,7 @@ FocusScope {
 
     Rectangle {
         anchors.fill: parent
-        color: "#d90a0e1a"
+        color: GameTheme.scrimStrong
     }
 
     MouseArea {
@@ -35,7 +36,7 @@ FocusScope {
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             text: qsTr("You Died")
-            color: "#e63946"
+            color: GameTheme.health
             font.pixelSize: 32
             font.bold: true
         }
@@ -46,7 +47,7 @@ FocusScope {
                     .arg(timeFormatter.duration(root.engine.elapsed))
                     .arg(root.engine.level)
                     .arg(root.engine.kills)
-            color: "#e8e8f0"
+            color: GameTheme.textPrimary
             font.pixelSize: 14
         }
 

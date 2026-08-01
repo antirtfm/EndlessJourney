@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import EndlessJourney.Backend 1.0
 
+import ".."
 import "../components"
 
 FocusScope {
@@ -46,7 +47,7 @@ FocusScope {
 
     Rectangle {
         anchors.fill: parent
-        color: "#d90a0e1a"
+        color: GameTheme.scrim
     }
 
     MouseArea {
@@ -61,7 +62,7 @@ FocusScope {
             anchors.horizontalCenter: parent.horizontalCenter
             text: qsTr("Level %1 — choose an upgrade").arg(
                       root.engine.powerupChoiceLevel)
-            color: "#f9c74f"
+            color: GameTheme.accent
             font.pixelSize: 20
             font.bold: true
         }
@@ -84,8 +85,8 @@ FocusScope {
                     width: 118
                     height: 120
                     radius: 8
-                    color: card.selected ? "#1c2541" : "#111827"
-                    border.color: card.selected ? "#f9c74f" : "#3a506b"
+                    color: card.selected ? GameTheme.surfaceRaised : GameTheme.surfaceDeep
+                    border.color: card.selected ? GameTheme.accent : GameTheme.border
                     border.width: card.selected ? 2 : 1
 
                     Accessible.role: Accessible.Button
@@ -101,7 +102,7 @@ FocusScope {
                         Text {
                             width: parent.width
                             text: (card.index + 1) + ". " + card.modelData.name
-                            color: "#e8e8f0"
+                            color: GameTheme.textEmphasis
                             font.pixelSize: 13
                             font.bold: true
                             wrapMode: Text.WordWrap
@@ -110,7 +111,7 @@ FocusScope {
                         Text {
                             width: parent.width
                             text: card.modelData.description
-                            color: "#8d99ae"
+                            color: GameTheme.textSecondary
                             font.pixelSize: 11
                             wrapMode: Text.WordWrap
                         }
@@ -140,7 +141,7 @@ FocusScope {
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             text: qsTr("arrows + enter, 1-3, or click")
-            color: "#8d99ae"
+            color: GameTheme.textMuted
             font.pixelSize: 10
         }
     }

@@ -29,6 +29,7 @@ set(PRODUCT_LICENSE_KEY "")
 # correct deployment, QML compilation and lint rules.
 set(QmlFiles
     qml/GameScene.qml
+    qml/GameTheme.qml
     qml/Main.qml
     qml/MainMenu.qml
     qml/components/GameActionButton.qml
@@ -47,6 +48,11 @@ set(QmlFiles
     qml/hud/PowerupDialog.qml
     qml/input/InputController.qml
     qml/util/TimeFormatter.qml
+)
+
+set_source_files_properties(
+    qml/GameTheme.qml
+    PROPERTIES QT_QML_SINGLETON_TYPE TRUE
 )
 
 set(Sources

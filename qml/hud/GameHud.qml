@@ -1,6 +1,7 @@
 import QtQuick
 import EndlessJourney.Backend 1.0
 
+import ".."
 import "../util"
 
 // In-game overlay: resource bars, level/xp, timer and kill counter.
@@ -22,21 +23,21 @@ Item {
             accessibleName: qsTr("Health")
             value: root.engine.hp
             maxValue: root.engine.maxHp
-            barColor: "#e63946"
+            barColor: GameTheme.health
         }
 
         HudBar {
             accessibleName: qsTr("Mana")
             value: root.engine.mana
             maxValue: root.engine.maxMana
-            barColor: "#4cc9f0"
+            barColor: GameTheme.mana
         }
 
         HudBar {
             accessibleName: qsTr("Stamina")
             value: root.engine.stamina
             maxValue: root.engine.maxStamina
-            barColor: "#90be6d"
+            barColor: GameTheme.stamina
         }
 
         Row {
@@ -49,12 +50,12 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 value: root.engine.xp
                 maxValue: root.engine.xpToNext
-                barColor: "#f9c74f"
+                barColor: GameTheme.accent
             }
 
             Text {
                 text: qsTr("Lv %1").arg(root.engine.level)
-                color: "#e8e8f0"
+                color: GameTheme.textPrimary
                 font.pixelSize: 11
             }
         }
@@ -69,7 +70,7 @@ Item {
         Text {
             anchors.right: parent.right
             text: timeFormatter.duration(root.engine.elapsed)
-            color: "#e8e8f0"
+            color: GameTheme.textPrimary
             font.pixelSize: 18
             font.bold: true
         }
@@ -77,7 +78,7 @@ Item {
         Text {
             anchors.right: parent.right
             text: qsTr("Kills: %1").arg(root.engine.kills)
-            color: "#8d99ae"
+            color: GameTheme.textSecondary
             font.pixelSize: 12
         }
 
@@ -104,9 +105,10 @@ Item {
 
                 anchors.centerIn: parent
                 text: qsTr("Menu")
-                color: menuTap.pressed ? "#ffffff"
-                                       : menuTap.containsMouse || menuButton.activeFocus ? "#e8e8f0"
-                                                                                       : "#8d99ae"
+                color: menuTap.pressed ? GameTheme.textEmphasis
+                                       : menuTap.containsMouse || menuButton.activeFocus
+                                         ? GameTheme.textPrimary
+                                         : GameTheme.textMuted
                 font.pixelSize: 11
                 font.underline: menuTap.containsMouse || menuButton.activeFocus
             }

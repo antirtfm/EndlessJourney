@@ -1,6 +1,8 @@
 ﻿pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Effects
+import EndlessJourney.Backend 1.0
+import ".."
 
 Item {
     id: root
@@ -86,7 +88,7 @@ Item {
             width: parent.width * Math.max(0, Math.min(1, root.hpRatio))
             height: parent.height
             radius: parent.radius
-            color: "#e63946"
+            color: GameTheme.health
         }
     }
 

@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import EndlessJourney.Backend 1.0
 
 FocusScope {
     id: menu
@@ -38,8 +39,8 @@ FocusScope {
 
         highlight: Rectangle {
             radius: 6
-            color: "#1c2541"
-            border.color: "#3a506b"
+            color: GameTheme.surface
+            border.color: GameTheme.border
             border.width: 1
         }
         highlightMoveDuration: 100
@@ -62,7 +63,9 @@ FocusScope {
             Text {
                 anchors.centerIn: parent
                 text: delegateItem.modelData.label
-                color: delegateItem.ListView.isCurrentItem ? "#ffffff" : "#8d99ae"
+                color: delegateItem.ListView.isCurrentItem
+                       ? GameTheme.textEmphasis
+                       : GameTheme.textSecondary
                 font.pixelSize: 16
             }
 

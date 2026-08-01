@@ -34,7 +34,7 @@ GameWindow {
         // background fills the whole window, beyond the logical scene bounds
         Rectangle {
             anchors.fill: menuScene.fullWindowAnchorItem
-            color: "#0a0e1a"
+            color: GameTheme.background
         }
 
         Column {
@@ -44,7 +44,7 @@ GameWindow {
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: qsTr("Endless Journey")
-                color: "#e8e8f0"
+                color: GameTheme.textPrimary
                 font.pixelSize: 30
             }
 

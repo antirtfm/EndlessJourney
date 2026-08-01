@@ -1,6 +1,7 @@
 import QtQuick
 import EndlessJourney.Backend 1.0
 
+import ".."
 import "../components"
 import "../util"
 
@@ -21,7 +22,7 @@ FocusScope {
 
     Rectangle {
         anchors.fill: parent
-        color: "#d90a0e1a"
+        color: GameTheme.scrim
     }
 
     MouseArea {
@@ -35,7 +36,7 @@ FocusScope {
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             text: qsTr("Paused")
-            color: "#e8e8f0"
+            color: GameTheme.textPrimary
             font.pixelSize: 32
             font.bold: true
         }
@@ -46,7 +47,7 @@ FocusScope {
                     .arg(timeFormatter.duration(root.engine.elapsed))
                     .arg(root.engine.level)
                     .arg(root.engine.kills)
-            color: "#8d99ae"
+            color: GameTheme.textSecondary
             font.pixelSize: 14
         }
 
@@ -78,7 +79,7 @@ FocusScope {
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             text: qsTr("escape to resume")
-            color: "#8d99ae"
+            color: GameTheme.textSecondary
             font.pixelSize: 10
         }
     }

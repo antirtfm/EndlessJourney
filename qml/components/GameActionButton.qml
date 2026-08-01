@@ -1,5 +1,7 @@
 import Felgo
 import QtQuick
+import EndlessJourney.Backend 1.0
+import ".."
 
 AppButton {
     id: root
@@ -12,22 +14,22 @@ AppButton {
     horizontalPadding: 8
     verticalPadding: 0
 
-    backgroundColor: root.highlighted ? "#1c2541" : "#111827"
-    backgroundColorHovered: "#1c2541"
-    backgroundColorPressed: "#3a506b"
-    disabledColor: "#0a0e1a"
+    backgroundColor: root.highlighted ? GameTheme.surfaceRaised : GameTheme.surface
+    backgroundColorHovered: GameTheme.surfaceRaised
+    backgroundColorPressed: GameTheme.border
+    disabledColor: GameTheme.surfaceDeep
 
-    borderColor: root.highlighted ? "#4cc9f0" : "#3a506b"
-    borderColorHovered: "#4cc9f0"
-    borderColorPressed: "#4cc9f0"
-    borderColorDisabled: "#263247"
+    borderColor: root.highlighted ? GameTheme.accent : GameTheme.border
+    borderColorHovered: GameTheme.accent
+    borderColorPressed: GameTheme.accent
+    borderColorDisabled: GameTheme.borderDisabled
     borderWidth: 1
     radius: 6
 
-    textColor: root.highlighted ? "#ffffff" : "#e8e8f0"
-    textColorHovered: "#ffffff"
-    textColorPressed: "#ffffff"
-    textColorDisabled: "#8d99ae"
+    textColor: root.highlighted ? GameTheme.textEmphasis : GameTheme.textPrimary
+    textColorHovered: GameTheme.textEmphasis
+    textColorPressed: GameTheme.textEmphasis
+    textColorDisabled: GameTheme.textMuted
     textSize: 14
     fontCapitalization: Font.MixedCase
     dropShadow: false

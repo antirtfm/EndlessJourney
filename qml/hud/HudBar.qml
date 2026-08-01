@@ -1,4 +1,6 @@
 import QtQuick
+import EndlessJourney.Backend 1.0
+import ".."
 
 // A resource bar (health, mana, stamina or experience).
 Item {
@@ -19,8 +21,8 @@ Item {
     Rectangle {
         anchors.fill: parent
         radius: 3
-        color: "#66000000"
-        border.color: "#33ffffff"
+        color: GameTheme.barTrack
+        border.color: GameTheme.barBorder
         border.width: 1
     }
 
