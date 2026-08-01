@@ -69,7 +69,7 @@ inline constexpr EnemyDefinition enemyRoster[] = {
 inline constexpr float enemyContactPadding = 2.0f;
 // Past the corner of the 480x320 scene, so enemies never appear on camera.
 inline constexpr float enemySpawnDistance = 340.0f;
-inline constexpr int maxEnemies = 100;
+inline constexpr int maxEnemies = 500;
 
 // Spawns start slow and creep faster; enemies get tougher over time.
 inline constexpr float spawnIntervalStart = 2.2f;

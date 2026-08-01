@@ -3,7 +3,6 @@
 #include "entity.h"
 #include "world.h"
 
-#include <algorithm>
 #include <unordered_set>
 
 namespace {
@@ -68,18 +67,31 @@ EntityModel::EntityModel(World* world, QObject* parent)
 {
 }
 
+void EntityModel::rebuildIdIndex()
+{
+    m_idToIndex.clear();
+    const auto& entities = m_world->entities();
+    m_idToIndex.reserve(entities.size());
+    for (std::size_t index = 0; index < entities.size(); ++index)
+        m_idToIndex.emplace(entities[index].id, index);
+}
+
 void EntityModel::resetRows()
 {
     beginResetModel();
     m_ids.clear();
     for (const Entity& entity : m_world->entities())
         m_ids.push_back(entity.id);
+    rebuildIdIndex();
     endResetModel();
 }
 
 void EntityModel::sync()
 {
+    rebuildIdIndex();
+
     std::unordered_set<int> liveIds;
+    liveIds.reserve(m_world->entities().size());
     for (const Entity& entity : m_world->entities())
         liveIds.insert(entity.id);
 
@@ -155,9 +167,9 @@ const Entity* EntityModel::entityForRow(int row) const
         return nullptr;
 
     const int id = m_ids[static_cast<std::size_t>(row)];
-    const auto& entities = m_world->entities();
-    const auto match = std::find_if(
-        entities.cbegin(), entities.cend(),
-        [id](const Entity& entity) { return entity.id == id; });
-    return match != entities.cend() ? &(*match) : nullptr;
+    const auto match = m_idToIndex.find(id);
+    if (match == m_idToIndex.cend())
+        return nullptr;
+
+    return &m_world->entities()[match->second];
 }

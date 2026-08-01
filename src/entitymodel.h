@@ -3,6 +3,7 @@
 #include <QAbstractListModel>
 #include <QtQml/qqmlregistration.h>
 
+#include <unordered_map>
 #include <vector>
 
 class World;
@@ -33,7 +34,9 @@ public:
 
 private:
     const Entity* entityForRow(int row) const;
+    void rebuildIdIndex();
 
     World* m_world = nullptr;
     std::vector<int> m_ids;
+    std::unordered_map<int, std::size_t> m_idToIndex;
 };
